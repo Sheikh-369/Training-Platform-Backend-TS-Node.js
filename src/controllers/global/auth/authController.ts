@@ -52,16 +52,17 @@ class AuthController{
             res.status(404).json({
                 message:"Email not registered!"
             })
-        }else{}
+        }else{
+            const isPassword=bcrypt.compareSync(password,data[0].password)
+            if(isPassword){
+                // Coming up next: generate JWT and proceed with login
+            }else{
+                res.status(404).json({
+                    message:"Invalid Email or Password!"
+                })
+            }
+        }
     }
 }
 
 export default AuthController
-
-
-git init
-git .
-git commit -m "Saas"
-git branch -M master
-git remote add origin https://github.com/Sheikh-369/Teaching-Platform-SaaS-Product.git
-git push -u origin master
