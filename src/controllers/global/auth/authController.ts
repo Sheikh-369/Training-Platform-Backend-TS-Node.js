@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import User from "../../../database/models/userModel";
 import bcrypt from "bcrypt"
-
+import jwt from "jsonwebtoken"
 class AuthController{
     static async registerUser(req:Request,res:Response){
         if(req.body===undefined){
@@ -55,7 +55,12 @@ class AuthController{
         }else{
             const isPassword=bcrypt.compareSync(password,data[0].password)
             if(isPassword){
-                // Coming up next: generate JWT and proceed with login
+                const token=jwt.sign({id:data[0].id},"Secret",{
+                expiresIn:"30d"})
+                res.status(200).json({
+                    token:token,
+                    message:"Login Successful!"
+                })                
             }else{
                 res.status(404).json({
                     message:"Invalid Email or Password!"
