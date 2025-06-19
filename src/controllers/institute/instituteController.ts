@@ -4,7 +4,7 @@ import generateRandomInstituteNumber from "../../services/randomNumberGenerator"
 
 
 
-
+    //input from user/body
     const createInstitute=async (req:Request,res:Response)=>{
         const {instituteName,instituteEmail,institutePhoneNumber,instituteAddress}=req.body
         const institutePanNumber=req.body.institutePanNumber || null
@@ -14,8 +14,11 @@ import generateRandomInstituteNumber from "../../services/randomNumberGenerator"
                 message:"All the fields are mendatory!"
             })
             return
-        }    
+        }
+        //the random number generator    
         const instituteNumber=generateRandomInstituteNumber()
+
+        //creating table for institute/registering table for the institute
         await sequelize.query(`CREATE TABLE IF NOT EXISTS institute_${instituteNumber}(
             id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
             instituteName VARCHAR(255) NOT NULL,
@@ -28,11 +31,16 @@ import generateRandomInstituteNumber from "../../services/randomNumberGenerator"
             updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )`)
 
+            //inserting(creating institute) data in the table above
             await sequelize.query(`INSERT INTO institute_${instituteNumber}(
                 instituteName,instituteEmail,institutePhoneNumber,instituteAddress,institutePanNumber,instituteVatNumber
                 ) VALUES (?,?,?,?,?,?)`,{
                     replacements:[instituteName,instituteEmail,institutePhoneNumber,instituteAddress,institutePanNumber,instituteVatNumber]
                 })
+
+                
+
+                //the success message after the institute is created
                 res.status(200).json({
                     message:"Institute Created Successfully!"
                 })
