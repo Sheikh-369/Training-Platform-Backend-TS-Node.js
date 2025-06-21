@@ -15,7 +15,7 @@ const isLoggedIn=async (req:IExtendedRequest,res:Response,next:NextFunction)=>{
         })
         return
     }
-    jwt.verify(token,"confidential",async(error,success:any)=>{
+    jwt.verify(token,"Secret",async(error,success:any)=>{
         // yadi token galat ayo vne
         if(error){
             res.status(403).json({
