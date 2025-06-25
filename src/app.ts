@@ -4,7 +4,7 @@ app.use(express.json())
 
 import authRoute from "./routes/global/auth/authRoute"
 import teachingRoute from "./routes/institute/instituteRoute"
-import teacherRoute from "./routes/institute/teacher/teacherController"
+import teacherRoute from "./routes/institute/teacher/teacherRoute"
 
 app.use("/teaching",authRoute)
 app.use("/teaching",teachingRoute)
