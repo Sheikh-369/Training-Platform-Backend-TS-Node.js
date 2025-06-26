@@ -62,14 +62,17 @@ import User from "../../database/models/userModel";
             }
         });
     }
-
-    req.instituteNumber = instituteNumber;
+    if(req.user){
+              req.user.currentInstituteNumber = instituteNumber  
+          }
+    // req.instituteNumber = instituteNumber;
     next()
     
 };        
 
 const createTeacherTable = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
-    const instituteNumber = req.instituteNumber;
+    // const instituteNumber = req.instituteNumber;
+    const instituteNumber=req.user?.currentInstituteNumber
     await sequelize.query(`CREATE TABLE IF NOT EXISTS teacher_${instituteNumber} (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
         teacherName VARCHAR(255) NOT NULL,
@@ -85,7 +88,8 @@ const createTeacherTable = async (req: IExtendedRequest, res: Response, next: Ne
 };
 
 const createStudentTable = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
-    const instituteNumber = req.instituteNumber;
+    // const instituteNumber = req.instituteNumber;
+    const instituteNumber=req.user?.currentInstituteNumber
     await sequelize.query(`CREATE TABLE IF NOT EXISTS student_${instituteNumber} (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
         studentName VARCHAR(255) NOT NULL,
@@ -100,7 +104,8 @@ const createStudentTable = async (req: IExtendedRequest, res: Response, next: Ne
 };
 
 const createCourseTable = async (req: IExtendedRequest, res: Response) => {
-    const instituteNumber = req.instituteNumber;
+    // const instituteNumber = req.instituteNumber;
+    const instituteNumber=req.user?.currentInstituteNumber
     await sequelize.query(`CREATE TABLE IF NOT EXISTS course_${instituteNumber} (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
         courseName VARCHAR(255) NOT NULL UNIQUE,

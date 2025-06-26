@@ -10,7 +10,7 @@ export interface IExtendedRequest extends Request{
        userName : string | null,
        currentInstituteNumber:string | number
        }, 
-       instituteNumber ?: number | string
+       // instituteNumber ?: number | string
        
       
 }
