@@ -39,7 +39,7 @@ import User from "../../database/models/userModel";
                 ) VALUES (?,?,?,?,?,?)`,{
                     replacements:[instituteName,instituteEmail,institutePhoneNumber,instituteAddress,institutePanNumber,instituteVatNumber]
                 })
-
+//creating table to track the number of institute created by a user
         await sequelize.query(`CREATE TABLE IF NOT EXISTS user_institute (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
         userId VARCHAR(255) REFERENCES user(id),
@@ -63,15 +63,14 @@ import User from "../../database/models/userModel";
         });
     }
     if(req.user){
-              req.user.currentInstituteNumber = instituteNumber  
+              req.user.currentInstituteNumber = instituteNumber//passing the same number
           }
-    // req.instituteNumber = instituteNumber;
     next()
     
 };        
 
 const createTeacherTable = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
-    // const instituteNumber = req.instituteNumber;
+    // the number for the institute to create tables simultaneously
     const instituteNumber=req.user?.currentInstituteNumber
     await sequelize.query(`CREATE TABLE IF NOT EXISTS teacher_${instituteNumber} (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -88,7 +87,6 @@ const createTeacherTable = async (req: IExtendedRequest, res: Response, next: Ne
 };
 
 const createStudentTable = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
-    // const instituteNumber = req.instituteNumber;
     const instituteNumber=req.user?.currentInstituteNumber
     await sequelize.query(`CREATE TABLE IF NOT EXISTS student_${instituteNumber} (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -104,7 +102,6 @@ const createStudentTable = async (req: IExtendedRequest, res: Response, next: Ne
 };
 
 const createCourseTable = async (req: IExtendedRequest, res: Response) => {
-    // const instituteNumber = req.instituteNumber;
     const instituteNumber=req.user?.currentInstituteNumber
     await sequelize.query(`CREATE TABLE IF NOT EXISTS course_${instituteNumber} (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
