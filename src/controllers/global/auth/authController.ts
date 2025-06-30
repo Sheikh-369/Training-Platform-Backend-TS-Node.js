@@ -3,6 +3,8 @@ import User from "../../../database/models/userModel";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 class AuthController{
+
+    //***********************REGISTER************************** */
     static async registerUser(req:Request,res:Response){
         if(req.body===undefined){
             res.status(400).json({
@@ -27,6 +29,7 @@ class AuthController{
         })
     }
 
+    //***********************LOGIN*************************** */
     static async loginUser(req:Request,res:Response){
         if(req.body===undefined){
             res.status(400).json({
