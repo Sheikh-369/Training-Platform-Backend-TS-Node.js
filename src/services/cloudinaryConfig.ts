@@ -9,9 +9,11 @@ cloudinary.config({
 
 const storage=new CloudinaryStorage({
     cloudinary,
-    params:async(req,file)=>({
+    params:async(req,file)=>(
+        {
         folder:"Teaching Platform"
-    })
+        }
+    )
 })
 
 export {cloudinary,storage}

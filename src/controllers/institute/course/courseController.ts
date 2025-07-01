@@ -6,15 +6,16 @@ import { QueryTypes } from "sequelize";
 const createCourse=async(req:IExtendedRequest,res:Response)=>{
     const instituteNumber=req.user?.currentInstituteNumber
     const {courseName,coursePrice,courseDuration,courseDescription,courseLevel}=req.body
+    const courseThumbnail=req.file?req.file.path: null
     if(!courseName || !coursePrice || !courseDuration || !courseDescription || !courseLevel){
         res.status(400).json({
             message:"Please fill all the fields!"
         })
         return
     }
-    await sequelize.query(`INSERT INTO course_${instituteNumber}(courseName,coursePrice,courseDuration,courseDescription,courseLevel) VALUES(?,?,?,?,?)`,{
+    await sequelize.query(`INSERT INTO course_${instituteNumber}(courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail) VALUES(?,?,?,?,?,?)`,{
         type:QueryTypes.INSERT,
-        replacements:[courseName,coursePrice,courseDuration,courseDescription,courseLevel]
+        replacements:[courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail]
     })
     res.status(200).json({
         message:"Course Created Successfully!",

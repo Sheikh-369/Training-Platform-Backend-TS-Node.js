@@ -109,8 +109,8 @@ const createCourseTable = async (req: IExtendedRequest, res: Response) => {
         coursePrice VARCHAR(255) NOT NULL,
         courseDuration VARCHAR(100) NOT NULL, 
         courseLevel ENUM('beginner','intermediate','advance') NOT NULL, 
-        courseThumbnail VARCHAR(200),
-        courseDescription TEXT, 
+        courseThumbnail VARCHAR(255),
+        courseDescription TEXT,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )`);
