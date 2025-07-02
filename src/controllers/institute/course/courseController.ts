@@ -63,4 +63,31 @@ const deleteCourse=async(req:IExtendedRequest,res:Response)=>{
     })
 }
 
-export {createCourse,getAllCourses,deleteCourse,getSingleCourse}
+const updateCourse = async (req: IExtendedRequest, res: Response) => {
+    const instituteNumber = req.user?.currentInstituteNumber;
+    const courseId = req.params.id;
+    const {courseName,coursePrice,courseDuration,courseDescription,courseLevel} = req.body;
+    const courseThumbnail = req.file ? req.file.path : null;
+
+    if (!courseName || !coursePrice || !courseDuration || !courseDescription || !courseLevel) {
+        res.status(400).json({
+            message: "Please fill all the fields!"
+        });
+        return;
+    }
+
+    await sequelize.query(`UPDATE course_${instituteNumber} 
+         SET courseName = ?,coursePrice = ?,courseDuration = ?,courseDescription = ?,courseLevel = ?, courseThumbnail = ? WHERE id = ?`,{
+            type: QueryTypes.UPDATE,
+            replacements: [courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail,courseId]
+        }
+    );
+
+    res.status(200).json({
+        message: "Course Updated Successfully!",
+        instituteNumber
+    });
+};
+
+
+export {createCourse,getAllCourses,deleteCourse,getSingleCourse,updateCourse}
