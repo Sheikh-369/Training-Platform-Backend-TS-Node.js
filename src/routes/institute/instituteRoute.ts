@@ -4,6 +4,6 @@ import { createCourseTable, createInstitute, createStudentTable, createTeacherTa
 import asyncErrorHandler from "../../services/asyncErrorHandler"
 const router:Router=express.Router()
 
-router.route("/institute").post(isLoggedIn,createInstitute,createTeacherTable,createStudentTable,asyncErrorHandler(createCourseTable))
+router.route("/institute").post(isLoggedIn,createInstitute,asyncErrorHandler(createTeacherTable),createStudentTable,asyncErrorHandler(createCourseTable))
 
 export default router

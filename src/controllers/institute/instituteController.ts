@@ -23,7 +23,7 @@ import User from "../../database/models/userModel";
         //creating table for institute/registering table for the institute
         await sequelize.query(`CREATE TABLE IF NOT EXISTS institute_${instituteNumber}(
             id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-            instituteName VARCHAR(255) NOT NULL,
+            instituteName VARCHAR(255) NOT NULL UNIQUE,
             instituteEmail VARCHAR(255) NOT NULL UNIQUE,
             institutePhoneNumber VARCHAR(255) NOT NULL UNIQUE,
             instituteAddress VARCHAR(255) NOT NULL,
@@ -78,7 +78,8 @@ const createTeacherTable = async (req: IExtendedRequest, res: Response, next: Ne
         teacherEmail VARCHAR(255) NOT NULL UNIQUE,
         teacherPhoneNumber VARCHAR(255) NOT NULL UNIQUE,
         teacherExpertise VARCHAR(255), 
-        joinedDate DATE, 
+        teacherJoinDate DATE,
+        teacherImage VARCHAR(225), 
         teacherSalary VARCHAR(100),
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -92,7 +93,7 @@ const createStudentTable = async (req: IExtendedRequest, res: Response, next: Ne
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
         studentName VARCHAR(255) NOT NULL,
         studentPhoneNo VARCHAR(255) NOT NULL UNIQUE,
-         studentAddress TEXT, 
+        studentAddress TEXT, 
         enrolledDate DATE, 
         studentImage VARCHAR(255),
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
@@ -121,7 +122,6 @@ const createCourseTable = async (req: IExtendedRequest, res: Response) => {
     });       
 };
 
-                
     
 
 export {createInstitute,createTeacherTable,createCourseTable,createStudentTable}
