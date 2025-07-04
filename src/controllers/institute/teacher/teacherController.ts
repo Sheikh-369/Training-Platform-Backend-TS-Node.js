@@ -14,6 +14,7 @@ const createTeacher=async(req:IExtendedRequest,res:Response)=>{
         res.status(400).json({
             message:"Please fill all the fields!"
         })
+        return
     }
 
     await sequelize.query(`INSERT INTO teacher_${instituteNumber}(
@@ -79,9 +80,9 @@ const updateTeacher=async(req:IExtendedRequest,res:Response)=>{
         return
     }
 
-    await sequelize.query(`UPDATE teacher_${instituteNumber} SET teacherName=?,teacherEmail=?,teacherPhoneNumber=?,teacherExpertise=?,teacherSalary=?,teacherImage=?,teacherJoinDate=?`,{
+    await sequelize.query(`UPDATE teacher_${instituteNumber} SET teacherName=?,teacherEmail=?,teacherPhoneNumber=?,teacherExpertise=?,teacherSalary=?,teacherImage=?,teacherJoinDate=? WHERE id=?`,{
         type:QueryTypes.UPDATE,
-        replacements:[teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherSalary,teacherJoinDate,teacherJoinDate]
+        replacements:[teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherSalary,teacherImage,teacherJoinDate,id]
     })
     res.status(200).json({
         message:"Teacher Updated Successfully!"
