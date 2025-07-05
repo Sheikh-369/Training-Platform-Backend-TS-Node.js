@@ -2,6 +2,8 @@ import { Response } from "express";
 import { IExtendedRequest } from "../../../middleware/type";
 import sequelize from "../../../database/connection";
 import { QueryTypes } from "sequelize";
+import randomPasswordGenerator from "../../../services/randomPasswordGenerator";
+import sendMail from "../../../services/sendMail";
 
 const createTeacher=async(req:IExtendedRequest,res:Response)=>{
     const instituteNumber=req.user?.currentInstituteNumber
@@ -16,12 +18,34 @@ const createTeacher=async(req:IExtendedRequest,res:Response)=>{
         })
         return
     }
+    const data=randomPasswordGenerator(teacherName)
 
     await sequelize.query(`INSERT INTO teacher_${instituteNumber}(
-        teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary) VALUES(?,?,?,?,?,?,?)`,{
+        teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary,teacherPassword) VALUES(?,?,?,?,?,?,?,?)`,{
             type:QueryTypes.INSERT,
-            replacements:[teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary]
+            replacements:[teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary,data.hashedVersion]
         })
+
+        const mailInformation={
+            to:teacherEmail,
+            subject:"You are WelCome to our ABC Language Center.",
+            html:`
+                <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <h2 style="color: #2E86C1;">Welcome to ABC Language Center, ${teacherName}!</h2>
+                <p>We’re excited to have you join our team of passionate educators.</p>
+                <p>Here are your login details:</p>
+                <ul style="background-color: #f4f4f4; padding: 15px; border-radius: 8px; list-style: none;">
+                    <li><strong>Email:</strong> ${teacherEmail}</li>
+                    <li><strong>Password:</strong> ${data.plainVersion}</li>
+                </ul>
+                <p>You can now log in to your account and start managing your classes.</p>
+                <p>If you have any questions or need support, feel free to reach out to our admin team.</p>
+                <br />
+                <p>Best regards,</p>
+                <p><strong>ABC Language Center</strong></p>
+                </div>`
+        }
+        await sendMail(mailInformation)
 
         res.status(200).json({
             message:"Teacher created successfully!",

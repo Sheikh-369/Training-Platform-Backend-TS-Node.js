@@ -81,6 +81,7 @@ const createTeacherTable = async (req: IExtendedRequest, res: Response, next: Ne
         teacherJoinDate DATE,
         teacherImage VARCHAR(225), 
         teacherSalary VARCHAR(100),
+        teacherPassword VARCHAR(225),
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )`);
