@@ -80,8 +80,7 @@ const updateCourse = async (req: IExtendedRequest, res: Response) => {
          SET courseName = ?,coursePrice = ?,courseDuration = ?,courseDescription = ?,courseLevel = ?, courseThumbnail = ?,categoryId=? WHERE id = ?`,{
             type: QueryTypes.UPDATE,
             replacements: [courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail,categoryId,courseId]
-        }
-    );
+        });
 
     res.status(200).json({
         message: "Course Updated Successfully!",
