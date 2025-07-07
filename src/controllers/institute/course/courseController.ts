@@ -5,17 +5,17 @@ import { QueryTypes } from "sequelize";
 
 const createCourse=async(req:IExtendedRequest,res:Response)=>{
     const instituteNumber=req.user?.currentInstituteNumber
-    const {courseName,coursePrice,courseDuration,courseDescription,courseLevel}=req.body
+    const {courseName,coursePrice,courseDuration,courseDescription,courseLevel,categoryId}=req.body
     const courseThumbnail=req.file?req.file.path: null
-    if(!courseName || !coursePrice || !courseDuration || !courseDescription || !courseLevel){
+    if(!courseName || !coursePrice || !courseDuration || !courseDescription || !courseLevel || !categoryId){
         res.status(400).json({
             message:"Please fill all the fields!"
         })
         return
     }
-    await sequelize.query(`INSERT INTO course_${instituteNumber}(courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail) VALUES(?,?,?,?,?,?)`,{
+    await sequelize.query(`INSERT INTO course_${instituteNumber}(courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail,categoryId) VALUES(?,?,?,?,?,?,?)`,{
         type:QueryTypes.INSERT,
-        replacements:[courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail]
+        replacements:[courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail,categoryId]
     })
     res.status(200).json({
         message:"Course Created Successfully!",
@@ -66,10 +66,10 @@ const deleteCourse=async(req:IExtendedRequest,res:Response)=>{
 const updateCourse = async (req: IExtendedRequest, res: Response) => {
     const instituteNumber = req.user?.currentInstituteNumber;
     const courseId = req.params.id;
-    const {courseName,coursePrice,courseDuration,courseDescription,courseLevel} = req.body;
+    const {courseName,coursePrice,courseDuration,courseDescription,courseLevel,categoryId} = req.body;
     const courseThumbnail = req.file ? req.file.path : null;
 
-    if (!courseName || !coursePrice || !courseDuration || !courseDescription || !courseLevel) {
+    if (!courseName || !coursePrice || !courseDuration || !courseDescription || !courseLevel || !categoryId) {
         res.status(400).json({
             message: "Please fill all the fields!"
         });
@@ -77,9 +77,9 @@ const updateCourse = async (req: IExtendedRequest, res: Response) => {
     }
 
     await sequelize.query(`UPDATE course_${instituteNumber} 
-         SET courseName = ?,coursePrice = ?,courseDuration = ?,courseDescription = ?,courseLevel = ?, courseThumbnail = ? WHERE id = ?`,{
+         SET courseName = ?,coursePrice = ?,courseDuration = ?,courseDescription = ?,courseLevel = ?, courseThumbnail = ?,categoryId=? WHERE id = ?`,{
             type: QueryTypes.UPDATE,
-            replacements: [courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail,courseId]
+            replacements: [courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail,categoryId,courseId]
         }
     );
 
