@@ -17,7 +17,20 @@ class AuthController{
             res.status(400).json({
                 message:"All the fields are mendatory!"
             })
+            return
         }
+
+        //checking if the email already exists
+        const data = await User.findAll({
+            where: { email }});
+            if (data.length > 0) {  // checks if available
+                res.status(409).json({ 
+                    message: "Email already registered!" 
+                });
+                return; 
+            }
+
+
 
         await User.create({
             userName:userName,

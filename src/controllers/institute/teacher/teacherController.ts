@@ -26,6 +26,7 @@ const createTeacher=async(req:IExtendedRequest,res:Response)=>{
             replacements:[teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary,data.hashedVersion]
         })
 
+        //mailing teacher the information
         const mailInformation={
             to:teacherEmail,
             subject:"You are WelCome to our ABC Language Center.",

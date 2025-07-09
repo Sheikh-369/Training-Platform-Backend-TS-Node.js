@@ -137,6 +137,7 @@ const createCourseTable = async (req: IExtendedRequest, res: Response) => {
         courseLevel ENUM('beginner','intermediate','advance') NOT NULL, 
         courseThumbnail VARCHAR(255),
         courseDescription TEXT,
+        teacherId INT REFERENCES teacher_${instituteNumber}(id),
         categoryId INT NOT NULL REFERENCES category_${instituteNumber}(id),
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

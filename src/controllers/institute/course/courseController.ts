@@ -5,7 +5,7 @@ import { QueryTypes } from "sequelize";
 
 const createCourse=async(req:IExtendedRequest,res:Response)=>{
     const instituteNumber=req.user?.currentInstituteNumber
-    const {courseName,coursePrice,courseDuration,courseDescription,courseLevel,categoryId}=req.body
+    const {courseName,coursePrice,courseDuration,courseDescription,courseLevel,categoryId,teacherId}=req.body
     const courseThumbnail=req.file?req.file.path: null
     if(!courseName || !coursePrice || !courseDuration || !courseDescription || !courseLevel || !categoryId){
         res.status(400).json({
@@ -13,10 +13,11 @@ const createCourse=async(req:IExtendedRequest,res:Response)=>{
         })
         return
     }
-    await sequelize.query(`INSERT INTO course_${instituteNumber}(courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail,categoryId) VALUES(?,?,?,?,?,?,?)`,{
+    await sequelize.query(`INSERT INTO course_${instituteNumber}(courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail,teacherId,categoryId) VALUES(?,?,?,?,?,?,?,?)`,{
         type:QueryTypes.INSERT,
-        replacements:[courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail,categoryId]
+        replacements:[courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail,teacherId || null,categoryId]
     })
+    
     res.status(200).json({
         message:"Course Created Successfully!",
         instituteNumber
@@ -66,7 +67,7 @@ const deleteCourse=async(req:IExtendedRequest,res:Response)=>{
 const updateCourse = async (req: IExtendedRequest, res: Response) => {
     const instituteNumber = req.user?.currentInstituteNumber;
     const courseId = req.params.id;
-    const {courseName,coursePrice,courseDuration,courseDescription,courseLevel,categoryId} = req.body;
+    const {courseName,coursePrice,courseDuration,courseDescription,courseLevel,categoryId,teacherId} = req.body;
     const courseThumbnail = req.file ? req.file.path : null;
 
     if (!courseName || !coursePrice || !courseDuration || !courseDescription || !courseLevel || !categoryId) {
@@ -77,11 +78,12 @@ const updateCourse = async (req: IExtendedRequest, res: Response) => {
     }
 
     await sequelize.query(`UPDATE course_${instituteNumber} 
-         SET courseName = ?,coursePrice = ?,courseDuration = ?,courseDescription = ?,courseLevel = ?, courseThumbnail = ?,categoryId=? WHERE id = ?`,{
+         SET courseName = ?,coursePrice = ?,courseDuration = ?,courseDescription = ?,courseLevel = ?, courseThumbnail = ?,categoryId=?,teacherId=? WHERE id = ?`,{
             type: QueryTypes.UPDATE,
-            replacements: [courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail,categoryId,courseId]
+            replacements: [courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail,categoryId,teacherId,courseId]
         });
 
+        
     res.status(200).json({
         message: "Course Updated Successfully!",
         instituteNumber
