@@ -71,7 +71,7 @@ class AuthController{
         }else{
             const isPassword=bcrypt.compareSync(password,data[0].password)
             if(isPassword){
-                const token=jwt.sign({id:data[0].id},"Secret",{
+                const token=jwt.sign({id:data[0].id},process.env.JWT_SECRET!,{
                 expiresIn:"30d"})
                 res.status(200).json({
                     token:token,

@@ -37,6 +37,7 @@ const createTeacher=async(req:IExtendedRequest,res:Response)=>{
                 <p>Here are your login details:</p>
                 <ul style="background-color: #f4f4f4; padding: 15px; border-radius: 8px; list-style: none;">
                     <li><strong>Email:</strong> ${teacherEmail}</li>
+                    <li><strong>Institute Number:</strong> ${instituteNumber}</li>
                     <li><strong>Password:</strong> ${data.plainVersion}</li>
                 </ul>
                 <p>You can now log in to your account and start managing your classes.</p>
