@@ -12,8 +12,8 @@ class AuthController{
             })
             return
         }
-        const {userName,email,password}=req.body
-        if(!userName || !email || !password){
+        const {userName,userEmail,userPassword}=req.body
+        if(!userName || !userEmail || !userPassword){
             res.status(400).json({
                 message:"All the fields are mendatory!"
             })
@@ -22,7 +22,7 @@ class AuthController{
 
         //checking if the email already exists
         const data = await User.findAll({
-            where: { email }});
+            where: { userEmail }});
             if (data.length > 0) {  // checks if available
                 res.status(409).json({ 
                     message: "Email already registered!" 
@@ -34,8 +34,8 @@ class AuthController{
 
         await User.create({
             userName:userName,
-            password:bcrypt.hashSync(password,10),
-            email:email
+            userPassword:bcrypt.hashSync(userPassword,10),
+            userEmail:userEmail
         })
         res.status(201).json({
             message:"User Registered Successfully!"
@@ -51,8 +51,8 @@ class AuthController{
             return
         }
 
-        const {email,password}=req.body
-        if(!email || !password){
+        const {userEmail,userPassword}=req.body
+        if(!userEmail || !userPassword){
             res.status(400).json({
                 message:"Please provide email and password!"
             })
@@ -61,7 +61,7 @@ class AuthController{
 
         const data=await User.findAll({
             where:{
-                email
+                userEmail
             }
         })
         if(data.length===0){
@@ -69,7 +69,7 @@ class AuthController{
                 message:"Email not registered!"
             })
         }else{
-            const isPassword=bcrypt.compareSync(password,data[0].password)
+            const isPassword=bcrypt.compareSync(userPassword,data[0].userPassword)
             if(isPassword){
                 const token=jwt.sign({id:data[0].id},process.env.JWT_SECRET!,{
                 expiresIn:"30d"})

@@ -23,12 +23,12 @@ class User extends Model{
         type:DataType.STRING,
         unique:true
     })
-    declare email:string
+    declare userEmail:string
 
     @Column({
         type:DataType.STRING
     })
-    declare password:string
+    declare userPassword:string
 
     @Column({
         type:DataType.ENUM(
