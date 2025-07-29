@@ -44,13 +44,7 @@ class AuthController{
 
     //***********************LOGIN*************************** */
     static async loginUser(req:Request,res:Response){
-        if(req.body===undefined){
-            res.status(400).json({
-                message:"No data was sent!"
-            })
-            return
-        }
-
+    
         const {userEmail,userPassword}=req.body
         if(!userEmail || !userPassword){
             res.status(400).json({
