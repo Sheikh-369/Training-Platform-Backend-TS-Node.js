@@ -47,7 +47,7 @@ const createTeacher=async(req:IExtendedRequest,res:Response)=>{
                 <p><strong>ABC Language Center</strong></p>
                 </div>`
         }
-        await sendMail(mailInformation)
+        // await sendMail(mailInformation)
 
         res.status(200).json({
             message:"Teacher created successfully!",
