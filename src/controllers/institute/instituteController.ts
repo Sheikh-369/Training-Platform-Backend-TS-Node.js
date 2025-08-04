@@ -138,7 +138,7 @@ const createCourseTable = async (req: IExtendedRequest, res: Response) => {
         courseThumbnail VARCHAR(255),
         courseDescription TEXT,
         teacherId INT REFERENCES teacher_${instituteNumber}(id),
-        categoryId INT NOT NULL REFERENCES category_${instituteNumber}(id),
+        categoryId INT NULL REFERENCES category_${instituteNumber}(id),
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )`);

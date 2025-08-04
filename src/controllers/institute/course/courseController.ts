@@ -7,7 +7,7 @@ const createCourse=async(req:IExtendedRequest,res:Response)=>{
     const instituteNumber=req.user?.currentInstituteNumber
     const {courseName,coursePrice,courseDuration,courseDescription,courseLevel,categoryId,teacherId}=req.body
     const courseThumbnail=req.file?req.file.path: null
-    if(!courseName || !coursePrice || !courseDuration || !courseDescription || !courseLevel || !categoryId){
+    if(!courseName || !coursePrice || !courseDuration || !courseDescription || !courseLevel){
         res.status(400).json({
             message:"Please fill all the fields!"
         })
@@ -15,7 +15,7 @@ const createCourse=async(req:IExtendedRequest,res:Response)=>{
     }
     await sequelize.query(`INSERT INTO course_${instituteNumber}(courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail,teacherId,categoryId) VALUES(?,?,?,?,?,?,?,?)`,{
         type:QueryTypes.INSERT,
-        replacements:[courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail,teacherId || null,categoryId]
+        replacements:[courseName,coursePrice,courseDuration,courseDescription,courseLevel,courseThumbnail,teacherId || null,categoryId || null]
     })
     
     res.status(200).json({
@@ -26,7 +26,16 @@ const createCourse=async(req:IExtendedRequest,res:Response)=>{
 
 const getAllCourses=async(req:IExtendedRequest,res:Response)=>{
     const instituteNumber=req.user?.currentInstituteNumber
-    const courses=await sequelize.query(`SELECT * FROM course_${instituteNumber} JOIN category_${instituteNumber} ON course_${instituteNumber}.categoryId=category_${instituteNumber}.id`,{
+    const courses=await sequelize.query(`SELECT 
+     course_${instituteNumber}.*, 
+     category_${instituteNumber}.categoryName AS categoryName,
+     category_${instituteNumber}.categoryDescription AS categoryDescription,
+     teacher_${instituteNumber}.teacherName AS teacherName
+   FROM course_${instituteNumber}
+   LEFT JOIN category_${instituteNumber} 
+     ON course_${instituteNumber}.categoryId = category_${instituteNumber}.id
+   LEFT JOIN teacher_${instituteNumber}
+     ON course_${instituteNumber}.teacherId = teacher_${instituteNumber}.id`,{
         type:QueryTypes.SELECT
     })
     res.status(200).json({
@@ -40,7 +49,17 @@ const getAllCourses=async(req:IExtendedRequest,res:Response)=>{
 const getSingleCourse=async(req:IExtendedRequest,res:Response)=>{
     const instituteNumber=req.user?.currentInstituteNumber
     const courseId=req.params.id
-    const course=await sequelize.query(`SELECT * FROM course_${instituteNumber} WHERE id=?`,{
+    const course=await sequelize.query(`SELECT 
+     course_${instituteNumber}.*, 
+     category_${instituteNumber}.categoryName AS categoryName,
+     category_${instituteNumber}.categoryDescription AS categoryDescription,
+     teacher_${instituteNumber}.teacherName AS teacherName
+   FROM course_${instituteNumber}
+   LEFT JOIN category_${instituteNumber} 
+     ON course_${instituteNumber}.categoryId = category_${instituteNumber}.id
+   LEFT JOIN teacher_${instituteNumber}
+     ON course_${instituteNumber}.teacherId = teacher_${instituteNumber}.id
+   WHERE course_${instituteNumber}.id = ?`,{
         type:QueryTypes.SELECT,
         replacements:[courseId]
     })
