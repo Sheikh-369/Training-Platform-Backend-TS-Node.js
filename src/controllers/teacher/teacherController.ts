@@ -22,10 +22,15 @@ const teacherLogin=async(req:Request,res:Response)=>{
     const teacher=result[0]
     if(!teacher){
         res.status(400).json({
-            message:"Invalid Credentials!"
+            message:"Invalid CrEdentials!"
         })
         return
     }
+
+    // console.log("Password received from login:", JSON.stringify(teacherPassword));
+    // console.log("Password stored in DB:", teacher.teacherPassword);
+
+
 
     const isPasswordMatch=bcrypt.compareSync(teacherPassword,teacher.teacherPassword)
     if(!isPasswordMatch){
@@ -34,18 +39,20 @@ const teacherLogin=async(req:Request,res:Response)=>{
         })
         return
     }
+    // console.log("Password match with trim:", isPasswordMatch);
     const token=jwt.sign({
         teacherId: teacher.id,
         teacherEmail: teacher.teacherEmail,
         instituteNumber
       },process.env.JWT_SECRET!,{expiresIn:"1d"})
+
       res.status(200).json({
         message:"Teacher Login Successful!",
         token,
         instituteNumber,
         teacherEmail
       })
-
 }
-
 export default teacherLogin
+
+

@@ -26,6 +26,9 @@ const createTeacher=async(req:IExtendedRequest,res:Response)=>{
             replacements:[teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary,data.hashedVersion]
         })
 
+        // console.log("Generated password:", data.plainVersion);
+
+
         //mailing teacher the information
         const mailInformation={
             to:teacherEmail,

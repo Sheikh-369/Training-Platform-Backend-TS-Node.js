@@ -14,14 +14,17 @@ app.use(express.json())
 app.use(cors({
     origin:"*"
 }))
-
-
+//auth
 app.use("/teaching/auth",authRoute)
+
+//institute
 app.use("/teaching",teachingRoute)
 app.use("/teaching/institute",teacherRoute)
 app.use("/teaching/institute",courseRoute)
 app.use("/teaching/institute",studentRoute)
 app.use("/teaching/institute",categoryRoute)
+
+//teacher
 app.use("/teaching/institute/teacher",teacherRoutePrivate)
 
 export default app
