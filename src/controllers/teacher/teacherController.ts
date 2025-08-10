@@ -48,9 +48,12 @@ const teacherLogin=async(req:Request,res:Response)=>{
 
       res.status(200).json({
         message:"Teacher Login Successful!",
-        token,
-        instituteNumber,
-        teacherEmail
+        data:{
+            token,
+            instituteNumber,
+            teacherEmail
+        }
+        
       })
 }
 export default teacherLogin
