@@ -9,6 +9,7 @@ import courseRoute from "./routes/institute/course/courseRoute"
 import studentRoute from "./routes/institute/student/studentRoute"
 import categoryRoute from "./routes/institute/category/categoryRoute"
 import teacherRoutePrivate from "./routes/teacher/teacherRouter"
+import chapterRoute from "./routes/teacher/course/chapter/chapterRoute"
 app.use(express.json())
 
 app.use(cors({
@@ -24,7 +25,8 @@ app.use("/teaching/institute",courseRoute)
 app.use("/teaching/institute",studentRoute)
 app.use("/teaching/institute",categoryRoute)
 
-//teacher
+//solo teacher
 app.use("/teaching/institute/teacher",teacherRoutePrivate)
+app.use("/teaching/institute/teacher",chapterRoute)
 
 export default app
