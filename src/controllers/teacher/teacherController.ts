@@ -4,7 +4,6 @@ import { QueryTypes } from "sequelize";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 
-
 const teacherLogin=async(req:Request,res:Response)=>{
     const {teacherEmail,teacherPassword,instituteNumber}=req.body
     if(!teacherEmail || !teacherPassword || !instituteNumber){

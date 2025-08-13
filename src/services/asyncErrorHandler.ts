@@ -7,7 +7,11 @@ const asyncErrorHandler = (fn:Function)=>{
             console.log(err, "ERROR")
             return res.status(500).json({
                 message : err.message, 
-                fullError : err
+                fullError: {
+                    name: err.name,
+                    message: err.message,
+                    stack: err.stack,
+                }
             })
         })
     }
