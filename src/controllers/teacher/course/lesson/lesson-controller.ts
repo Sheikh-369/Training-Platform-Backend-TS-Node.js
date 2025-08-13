@@ -20,7 +20,7 @@ const createChapterLesson = async(req:IExtendedRequest,res:Response)=>{
     const lessonVideo = files.lessonVideo?.[0]?.path || null;
 
 
-    if(!lessonName || !lessonDescription || !lessonVideo || !lessonThumbnail || !chapterId){
+    if(!lessonName || !lessonDescription || !chapterId){
         res.status(400).json({
             message : "Please fill all the fields!"
         })
@@ -38,9 +38,21 @@ const createChapterLesson = async(req:IExtendedRequest,res:Response)=>{
 const editChapterLesson = async(req:IExtendedRequest,res:Response)=>{
     const lessonId=req.params.id
     const instituteNumber = req.user?.currentInstituteNumber
-    const {lessonName, lessonDescription,lessonVideo,lessonThumbnail,chapterId} = req.body
+    const {lessonName, lessonDescription,chapterId} = req.body
+
+    //dealing with taking files in different fields
+    interface MulterFiles {
+    lessonThumbnail?: Express.Multer.File[];
+    lessonVideo?: Express.Multer.File[];
+    }
+
+    // Then inside handler:
+    const files = req.files as MulterFiles;
+
+    const lessonThumbnail = files.lessonThumbnail?.[0]?.path || null;
+    const lessonVideo = files.lessonVideo?.[0]?.path || null;
      
-    if(!lessonName || !lessonDescription || !lessonVideo || !lessonThumbnail || !chapterId){
+    if(!lessonName || !lessonDescription || !chapterId){
         res.status(400).json({
             message : "Please fill all the fields!"
         })

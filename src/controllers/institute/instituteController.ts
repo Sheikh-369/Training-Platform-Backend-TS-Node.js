@@ -111,8 +111,8 @@ const createChapterLessonTable=async(req:IExtendedRequest,res:Response,next:Next
         id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
         lessonName VARCHAR(225) NOT NULL,
         lessonDescription TEXT, 
-        lessonVideo VARCHAR(200) NOT NULL, 
-        lessonThumbnail VARCHAR(200) NOT NULL, 
+        lessonVideo VARCHAR(200), 
+        lessonThumbnail VARCHAR(200), 
         chapterId INT REFERENCES course_chapter_${instituteNumber}(id) ON DELETE CASCADE ON UPDATE CASCADE, 
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
