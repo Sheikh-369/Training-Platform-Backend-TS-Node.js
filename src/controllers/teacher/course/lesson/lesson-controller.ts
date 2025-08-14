@@ -18,6 +18,7 @@ const createChapterLesson = async(req:IExtendedRequest,res:Response)=>{
 
     const lessonThumbnail = files.lessonThumbnail?.[0]?.path || null;
     const lessonVideo = files.lessonVideo?.[0]?.path || null;
+    console.log(req.file)
 
     if(!lessonName || !lessonDescription || !chapterId){
         res.status(400).json({
