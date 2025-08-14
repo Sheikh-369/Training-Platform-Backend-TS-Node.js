@@ -3,6 +3,12 @@ import jwt from "jsonwebtoken"
 import User from "../database/models/userModel";
 import { IExtendedRequest } from "./type";
 
+export enum Role{
+    SuperAdmin="super-admin",
+    Institute = 'institute', 
+    Teacher = "teacher",
+    Student="student"
+}
 
 // log in logic
 const isLoggedIn=async (req:IExtendedRequest,res:Response,next:NextFunction)=>{
@@ -38,4 +44,17 @@ const isLoggedIn=async (req:IExtendedRequest,res:Response,next:NextFunction)=>{
     })
 }
 
-export default isLoggedIn
+const accessTo=(...roles:Role[])=>{ 
+        return (req:IExtendedRequest,res:Response,next:NextFunction)=>{
+            const userRole = req.user?.role as Role
+           if(!roles.includes(userRole)){
+                res.status(403).json({
+                    message : `As a ${userRole ?? "guest"}, you do not have access to this action.`
+                })
+                return
+            }
+            next()
+        }
+    }
+
+export {isLoggedIn,accessTo}

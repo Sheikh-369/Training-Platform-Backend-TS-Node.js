@@ -19,7 +19,6 @@ const createChapterLesson = async(req:IExtendedRequest,res:Response)=>{
     const lessonThumbnail = files.lessonThumbnail?.[0]?.path || null;
     const lessonVideo = files.lessonVideo?.[0]?.path || null;
 
-
     if(!lessonName || !lessonDescription || !chapterId){
         res.status(400).json({
             message : "Please fill all the fields!"

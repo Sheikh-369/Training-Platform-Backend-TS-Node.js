@@ -6,7 +6,9 @@ import { QueryTypes } from "sequelize";
 const createCourse=async(req:IExtendedRequest,res:Response)=>{
     const instituteNumber=req.user?.currentInstituteNumber
     const {courseName,coursePrice,courseDuration,courseDescription,courseLevel,categoryId,teacherId}=req.body
+
     const courseThumbnail=req.file?req.file.path: null
+    
     if(!courseName || !coursePrice || !courseDuration || !courseDescription || !courseLevel){
         res.status(400).json({
             message:"Please fill all the fields!"

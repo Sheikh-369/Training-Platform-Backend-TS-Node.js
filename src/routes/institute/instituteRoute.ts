@@ -1,7 +1,7 @@
 import express, { Router } from "express"
-import isLoggedIn from "../../middleware/middleware"
 import { createCategoryTable, createChapterLessonTable, createCourseChapterTable, createCourseTable, createInstitute, createStudentTable, createTeacherTable } from "../../controllers/institute/instituteController"
 import asyncErrorHandler from "../../services/asyncErrorHandler"
+import { isLoggedIn } from "../../middleware/middleware"
 const router:Router=express.Router()
 
 router.route("/institute").post(isLoggedIn,
