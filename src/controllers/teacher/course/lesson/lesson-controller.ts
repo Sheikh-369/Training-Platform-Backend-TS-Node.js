@@ -15,7 +15,9 @@ const createChapterLesson = async(req:IExtendedRequest,res:Response)=>{
 
     // Then inside handler:
     const files = req.files as MulterFiles;
-
+    //@ts-ignore
+    console.log(Object.keys(req.files))
+    console.log(req.files)
     const lessonThumbnail = files.lessonThumbnail?.[0]?.path || null;
     const lessonVideo = files.lessonVideo?.[0]?.path || null;
     console.log(req.file)

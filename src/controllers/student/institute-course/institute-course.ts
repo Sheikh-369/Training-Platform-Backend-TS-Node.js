@@ -32,4 +32,36 @@ const fetchInstitutes=async(req:Request,res:Response)=>{
     console.log(tables)
 }
 
-export {fetchInstitutes}
+const instituteCourseListForStudent = async(req:Request,res:Response)=>{
+    const instituteId = req.params.instituteId
+    const datas = await sequelize.query(`
+        SELECT 
+            c.courseName, 
+            c.coursePrice, 
+            c.courseDuration, 
+            c.courseDescription,
+            cat.categoryName,
+            t.teacherName
+        FROM course_${instituteId} AS c
+        LEFT JOIN category_${instituteId} AS cat
+            ON c.categoryId = cat.id
+        LEFT JOIN teacher_${instituteId} AS t
+            ON c.teacherId = t.id`,{
+        type : QueryTypes.SELECT
+    })
+    console.log(datas.length)
+    if(datas.length == 0){
+        res.status(404).json({
+            message : "No courses found of that institute"
+        })
+    }else{
+
+        res.status(200).json({
+            message : "Courses Fetched Successfully!", 
+            data : datas
+        })
+    }
+}
+
+
+export {fetchInstitutes,instituteCourseListForStudent}
