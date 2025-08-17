@@ -1,11 +1,12 @@
 import express, { Router } from "express"
 import asyncErrorHandler from "../../../../services/asyncErrorHandler"
 import { addChapterToCourse, deleteChapter, editChapter, fetchCourseChapters } from "../../../../controllers/teacher/course/chapter/chapterController"
-import { isLoggedIn } from "../../../../middleware/middleware"
+import { accessTo, isLoggedIn, Role } from "../../../../middleware/middleware"
 
 const route:Router=express.Router()
 
 route.route("/course/chapter").post(isLoggedIn,
+    accessTo(Role.Teacher),
     asyncErrorHandler(addChapterToCourse))
 
 route.route("/course/chapter/:id").get(isLoggedIn,

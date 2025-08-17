@@ -3,6 +3,7 @@ import sequelize from "../../database/connection";
 import { QueryTypes } from "sequelize";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import User from "../../database/models/userModel";
 
 const teacherLogin=async(req:Request,res:Response)=>{
     const {teacherEmail,teacherPassword,instituteNumber}=req.body
@@ -38,9 +39,25 @@ const teacherLogin=async(req:Request,res:Response)=>{
         })
         return
     }
+
+    //logic to get user data from users table
+    const userArr=await User.findAll({where:{
+        userEmail:teacherEmail,
+        role:"teacher"
+    }})
+
+    const user = userArr[0]; // Grab the first user
+
+    if (!user) {
+    res.status(404).json({ 
+        message: "User not found in users table!" 
+    });
+    return
+    }
+    
     // console.log("Password match with trim:", isPasswordMatch);
     const token=jwt.sign({
-        teacherId: teacher.id,
+        id:user.id,
         teacherEmail: teacher.teacherEmail,
         instituteNumber
       },process.env.JWT_SECRET!,{expiresIn:"1d"})
@@ -54,6 +71,8 @@ const teacherLogin=async(req:Request,res:Response)=>{
         }
         
       })
+
+
 }
 export default teacherLogin
 

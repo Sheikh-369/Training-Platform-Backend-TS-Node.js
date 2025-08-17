@@ -4,6 +4,7 @@ import sequelize from "../../../database/connection";
 import { QueryTypes } from "sequelize";
 import randomPasswordGenerator from "../../../services/randomPasswordGenerator";
 import sendMail from "../../../services/sendMail";
+import User from "../../../database/models/userModel";
 
 const createTeacher=async(req:IExtendedRequest,res:Response)=>{
     const instituteNumber=req.user?.currentInstituteNumber
@@ -25,9 +26,16 @@ const createTeacher=async(req:IExtendedRequest,res:Response)=>{
             type:QueryTypes.INSERT,
             replacements:[teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary,data.hashedVersion]
         })
-
+        
+        //creating teacher role for chapter and lesson activities
+        await User.create({
+        userName: teacherName,
+        userEmail: teacherEmail,
+        userPassword: data.hashedVersion,
+        role: "teacher",
+        currentInstituteNumber: instituteNumber
+    });
         // console.log("Generated password:", data.plainVersion);
-
 
         //mailing teacher the information
         const mailInformation={
