@@ -44,6 +44,18 @@ const isLoggedIn=async (req:IExtendedRequest,res:Response,next:NextFunction)=>{
     })
 }
 
+const changeUserIdForTableName = (req:IExtendedRequest,res:Response,next:NextFunction)=>{
+    console.log(req.user,"Req user outside")
+    if(req.user && req.user.id){
+         const newUserId =  req.user.id.split("-").join("_") 
+         req.user = {id:newUserId,role:req.user.role}
+         console.log(req.user,"RequserId")
+        //  console.log(req.user?.id.split("-").join("_") ,"data")
+        next()
+        }
+
+}
+
 const accessTo=(...roles:Role[])=>{ 
         return (req:IExtendedRequest,res:Response,next:NextFunction)=>{
             const userRole = req.user?.role as Role
@@ -57,4 +69,5 @@ const accessTo=(...roles:Role[])=>{
         }
     }
 
-export {isLoggedIn,accessTo}
+    
+export {isLoggedIn,accessTo,changeUserIdForTableName}
