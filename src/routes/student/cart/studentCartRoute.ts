@@ -11,9 +11,14 @@ router.route("/cart").post(isLoggedIn,
     asyncErrorHandler(insertIntoCartTableOfStudent))
     
 router.route("/cart").get(isLoggedIn,
-    accessTo(Role.Student),asyncErrorHandler(fetchStudentCartItems))
+    changeUserIdForTableName,
+    accessTo(Role.Student),
+    asyncErrorHandler(fetchStudentCartItems))
 
-router.route("/cart/:id").delete(isLoggedIn,accessTo(Role.Student)).delete(asyncErrorHandler(deleteStudentCartItem))
+router.route("/cart/:id").delete(isLoggedIn,
+    changeUserIdForTableName,
+    accessTo(Role.Student)),
+    (asyncErrorHandler(deleteStudentCartItem))
 
 
 export default router;

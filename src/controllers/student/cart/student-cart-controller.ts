@@ -3,6 +3,7 @@ import { IExtendedRequest } from "../../../middleware/type"
 import sequelize from "../../../database/connection"
 import { QueryTypes } from "sequelize"
 
+
 const insertIntoCartTableOfStudent = async(req:IExtendedRequest,res:Response)=>{
     const userId = req.user?.id  //user ko identity
     console.log(userId,"userId")
@@ -32,31 +33,44 @@ const insertIntoCartTableOfStudent = async(req:IExtendedRequest,res:Response)=>{
     })
 }
 
-const fetchStudentCartItems = async(req:IExtendedRequest,res:Response)=>{
-    const userId = req.user?.id 
+const fetchStudentCartItems = async (req: IExtendedRequest, res: Response) => {
+  const userId = req.user?.id;
 
-    let cartDatas = [] //data to be idsplayed on student's interface
+  let cartDatas = [];  //data collection
 
-    const datas :{instituteId : string, courseId : string}[] = await sequelize.query(`SELECT courseId,instituteId FROM student_cart_${userId} WHERE userId=?`,{
-        type : QueryTypes.SELECT, 
-        replacements : [userId]
-    })
-    
-    for(let data of datas){
-
-    const test =  await sequelize.query(`SELECT * FROM course_${data.instituteId} JOIN category_${data.instituteId} ON course_${data.instituteId}.categoryId = category_${data.instituteId}.id WHERE id='${data.courseId}'`,{
-        type : QueryTypes.SELECT
-    })
-    console.log(test)
-    cartDatas.push(...test)
+  //getting instituteID and courseId
+  const datas: { instituteId: string; courseId: string }[] = await sequelize.query(
+    `SELECT courseId,instituteId FROM student_cart_${userId} WHERE userId=?`,
+    {
+      type: QueryTypes.SELECT,
+      replacements: [userId],
     }
-    res.status(200).json({
-        message : "Cart Items Fetchd Successfully!", 
-        data : cartDatas
-    })
+  );
 
-    
-}
+  //displaying each items of cart table
+  for (let data of datas) {
+    const test = await sequelize.query(
+      `SELECT * FROM course_${data.instituteId} JOIN category_${data.instituteId} ON course_${data.instituteId}.categoryId = category_${data.instituteId}.id WHERE course_${data.instituteId}.id='${data.courseId}'`,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (test.length > 0) {
+      cartDatas.push(...test);
+    } else {
+      console.warn(`No course found with id ${data.courseId} in course_${data.instituteId}`);
+    }
+  }
+
+  // Send response only once, after the loop
+  res.status(200).json({
+    message: "Cart Items Fetchd Successfully!",
+    data: cartDatas,
+  });
+};
+
+
 
 const deleteStudentCartItem = async(req:IExtendedRequest,res:Response)=>{
     const userId = req.user?.id
