@@ -17,8 +17,8 @@ router.route("/cart").get(isLoggedIn,
 
 router.route("/cart/:id").delete(isLoggedIn,
     changeUserIdForTableName,
-    accessTo(Role.Student)),
-    (asyncErrorHandler(deleteStudentCartItem))
+    accessTo(Role.Student),
+    asyncErrorHandler(deleteStudentCartItem))
 
 
 export default router;

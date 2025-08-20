@@ -74,7 +74,7 @@ const fetchStudentCartItems = async (req: IExtendedRequest, res: Response) => {
 
 const deleteStudentCartItem = async(req:IExtendedRequest,res:Response)=>{
     const userId = req.user?.id
-    const cartTableId = req.params.cartTableId; 
+    const cartTableId = req.params.id; 
 
     if(!cartTableId){
         res.status(400).json({
@@ -83,7 +83,7 @@ const deleteStudentCartItem = async(req:IExtendedRequest,res:Response)=>{
         return
     }
 
-    await sequelize.query(`DELETE FROM student_cart_${userId} WHERE cartTableId=?`,{
+    await sequelize.query(`DELETE FROM student_cart_${userId} WHERE id=?`,{
         type : QueryTypes.DELETE, 
         replacements : [cartTableId]
     })
