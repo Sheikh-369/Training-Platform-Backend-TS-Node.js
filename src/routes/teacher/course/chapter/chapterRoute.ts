@@ -3,19 +3,21 @@ import asyncErrorHandler from "../../../../services/asyncErrorHandler"
 import { addChapterToCourse, deleteChapter, editChapter, fetchCourseChapters } from "../../../../controllers/teacher/course/chapter/chapterController"
 import { accessTo, isLoggedIn, Role } from "../../../../middleware/middleware"
 
-const route:Router=express.Router()
+const router:Router=express.Router()
 
-route.route("/course/chapter").post(isLoggedIn,
+router.route("/course/chapter").post(isLoggedIn,
     accessTo(Role.Teacher),
     asyncErrorHandler(addChapterToCourse))
 
-route.route("/course/chapter/:id").get(isLoggedIn,
+router.route("/:courseId/chapter").get(isLoggedIn,
     asyncErrorHandler(fetchCourseChapters))
 
-route.route("/course/chapter/:id").patch(isLoggedIn,
+router.route("/course/chapter/:id").patch(isLoggedIn,
+    accessTo(Role.Teacher),
     asyncErrorHandler(editChapter))
 
-route.route("/course/chapter/:id").delete(isLoggedIn,
+router.route("/course/chapter/:id").delete(isLoggedIn,
+    accessTo(Role.Teacher),
     asyncErrorHandler(deleteChapter))
 
-export default route
+export default router

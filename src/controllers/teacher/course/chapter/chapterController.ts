@@ -71,7 +71,7 @@ const editChapter=async(req:IExtendedRequest,res:Response)=>{
 }
 
 const fetchCourseChapters = async (req:IExtendedRequest,res:Response)=>{
-      const courseId = req.params.id 
+      const courseId = req.params.courseId 
     const instituteNumber = req.user?.currentInstituteNumber; 
     if(!courseId){
         res.status(400).json({
@@ -80,6 +80,7 @@ const fetchCourseChapters = async (req:IExtendedRequest,res:Response)=>{
         return
     }
 
+    console.log("instituteNumber",instituteNumber)
     const data = await sequelize.query(`SELECT * FROM course_chapter_${instituteNumber} WHERE courseId=?`,{
         replacements: [courseId],
         type: QueryTypes.SELECT
