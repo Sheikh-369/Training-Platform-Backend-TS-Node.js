@@ -19,14 +19,13 @@ const createTeacher=async(req:IExtendedRequest,res:Response)=>{
         })
         return
     }
-    const data=randomPasswordGenerator(teacherName)
 
-    await sequelize.query(`INSERT INTO teacher_${instituteNumber}(
-        teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary,teacherPassword) VALUES(?,?,?,?,?,?,?,?)`,{
-            type:QueryTypes.INSERT,
-            replacements:[teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary,data.hashedVersion]
-        })
-        
+    const existingUser=await User.findAll({
+        where:{userEmail:teacherEmail}
+    })
+
+    const data=randomPasswordGenerator(teacherName)
+    if(existingUser.length===0){
         //creating teacher role for chapter and lesson activities
         await User.create({
         userName: teacherName,
@@ -35,6 +34,15 @@ const createTeacher=async(req:IExtendedRequest,res:Response)=>{
         role: "teacher",
         currentInstituteNumber: instituteNumber
     });
+    }
+    
+    await sequelize.query(`INSERT INTO teacher_${instituteNumber}(
+        teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary,teacherPassword) VALUES(?,?,?,?,?,?,?,?)`,{
+            type:QueryTypes.INSERT,
+            replacements:[teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary,data.hashedVersion]
+        })
+        
+        
         // console.log("Generated password:", data.plainVersion);
 
         //mailing teacher the information
