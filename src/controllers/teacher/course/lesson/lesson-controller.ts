@@ -70,17 +70,17 @@ const editChapterLesson = async(req:IExtendedRequest,res:Response)=>{
 
 }
 const fetchChapterLesson = async(req:IExtendedRequest,res:Response)=>{
-    const lessonId = req.params.id 
+    const chapterId = req.params.chapterId 
     const instituteNumber = req.user?.currentInstituteNumber
-    if(!lessonId){
+    if(!chapterId){
         res.status(400).json({
             message : "Please Provide ChapterId!"
         })
         return
     }
-      const data =   await sequelize.query(`SELECT * FROM chapter_lesson_${instituteNumber} WHERE id=?`,{
+      const data =   await sequelize.query(`SELECT * FROM chapter_lesson_${instituteNumber} WHERE chapterId=?`,{
     type : QueryTypes.SELECT, 
-    replacements : [lessonId]
+    replacements : [chapterId]
     })
     res.status(200).json({
         message : "Lessons Fetched Successfully!", 
