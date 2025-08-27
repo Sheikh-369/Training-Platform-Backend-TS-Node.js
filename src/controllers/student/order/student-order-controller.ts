@@ -82,7 +82,8 @@ const createStudentCourseOrder = async(req:IExtendedRequest,res:Response)=>{
             pidx VARCHAR(100),
             transaction_uuid VARCHAR(150), 
             createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
-            updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE(orderId)
         )`)
         
         // insert query for student-order
@@ -176,7 +177,21 @@ const createStudentCourseOrder = async(req:IExtendedRequest,res:Response)=>{
         })
         if(response.status === 200){
             pidx=response.data.pidx
-            // Insert payment record for all payment methods
+            
+            //stopping from double or more payment
+            const [alreadyPaid]= await sequelize.query(
+                `SELECT * FROM student_payment_${userId} WHERE orderId = ? AND paymentMethod =?`,{
+                    type: QueryTypes.SELECT,
+                    replacements: [orderId, paymentMethod],
+                });
+
+                if (alreadyPaid) {
+                    res.status(409).json({
+                        message: "Payment already initiated for this order.",
+                    });
+                    return
+                }
+            // Insert payment record for all payment methods 
             await sequelize.query(
             `INSERT INTO student_payment_${userId}(paymentMethod, paymentStatus, totalAmount, orderId, pidx) VALUES (?, ?, ?, ?, ?)`,
             {
@@ -202,6 +217,21 @@ const createStudentCourseOrder = async(req:IExtendedRequest,res:Response)=>{
         }else if(paymentMethod === PaymentMethod.COD){
             // COD function call here
             pidx=null
+
+            //stopping from double or more payment
+            const [alreadyPaid]= await sequelize.query(
+                `SELECT * FROM student_payment_${userId} WHERE orderId = ? AND paymentMethod =?`,{
+                    type: QueryTypes.SELECT,
+                    replacements: [orderId, paymentMethod],
+                });
+
+                if (alreadyPaid) {
+                    res.status(409).json({
+                        message: "Payment already initiated for this order.",
+                    });
+                    return
+                }
+
             // Insert payment record for all payment methods
             await sequelize.query(
             `INSERT INTO student_payment_${userId}(paymentMethod, paymentStatus, totalAmount, orderId, pidx) VALUES (?, ?, ?, ?, ?)`,
