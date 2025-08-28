@@ -44,8 +44,6 @@ const addChapterToCourse = async(req:IExtendedRequest,res:Response)=>{
     res.status(200).json({
         message : "Chapter Added Successfully!"
     })
-
-
 }
 
 const editChapter=async(req:IExtendedRequest,res:Response)=>{

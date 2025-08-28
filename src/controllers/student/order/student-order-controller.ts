@@ -218,21 +218,7 @@ const createStudentCourseOrder = async(req:IExtendedRequest,res:Response)=>{
             // COD function call here
             pidx=null
 
-            //stopping from double or more payment
-            const [alreadyPaid]= await sequelize.query(
-                `SELECT * FROM student_payment_${userId} WHERE orderId = ? AND paymentMethod =?`,{
-                    type: QueryTypes.SELECT,
-                    replacements: [orderId, paymentMethod],
-                });
-
-                if (alreadyPaid) {
-                    res.status(409).json({
-                        message: "Payment already initiated for this order.",
-                    });
-                    return
-                }
-
-            // Insert payment record for all payment methods
+            // Insert payment record for payment methods
             await sequelize.query(
             `INSERT INTO student_payment_${userId}(paymentMethod, paymentStatus, totalAmount, orderId, pidx) VALUES (?, ?, ?, ?, ?)`,
             {
@@ -278,11 +264,11 @@ const khaltiPaymentVerification = async(req:IExtendedRequest,res:Response)=>{
             replacements : ['paid',pidx]
         })
         res.status(200).json({
-            message : "Payment verified successfully"
+            message : "Payment Verified Successfully!"
         })
     }else{
         res.status(500).json({
-            message : "Payment not verified!!"
+            message : "Payment Not Verified!"
         })
     }
 }
