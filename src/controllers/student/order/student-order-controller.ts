@@ -150,9 +150,9 @@ const createStudentCourseOrder = async(req:IExtendedRequest,res:Response)=>{
             console.log(response.request.res.responseUrl,"This is response")
 
             if(response.status === 200){
-                    await sequelize.query(`INSERT INTO student_payment_${userId}(paymentMethod,paymentStatus,totalAmount,orderId,transaction_uuid) VALUES(?,?,?,?)`,{
+                    await sequelize.query(`INSERT INTO student_payment_${userId}(paymentMethod,paymentStatus,totalAmount,orderId,transaction_uuid) VALUES(?,?,?,?,?)`,{
             type : QueryTypes.INSERT, 
-            replacements : [paymentMethod,"pending",totalAmount,orderId,paymentData.transaction_uuid]
+            replacements : [paymentMethod,"pending",amount,orderId,paymentData.transaction_uuid]
         })
 
                 res.status(200).json({
