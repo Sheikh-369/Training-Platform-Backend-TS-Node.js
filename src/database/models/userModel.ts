@@ -42,6 +42,24 @@ class User extends Model{
         type:DataType.STRING
     })
     declare currentInstituteNumber:string
+
+    @Column({
+        type:DataType.STRING,
+        allowNull:true
+    })
+    declare OTP:string | null
+
+    @Column({
+        type:DataType.STRING,
+        allowNull:true
+    })
+    declare OTPGeneratedTime:Date | string | null
+
+    @Column({
+        type:DataType.STRING,
+        allowNull:true
+    })
+    declare OTPExpiry:Date | string | null
 }
 
 export default User
