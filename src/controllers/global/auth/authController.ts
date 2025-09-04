@@ -105,6 +105,13 @@ class AuthController{
     }
 
     const OTP=generateOTP()
+    
+    user.OTP=OTP.toString()
+    user.OTPGeneratedTime=new Date().toLocaleString()
+    user.OTPExpiry=new Date(Date.now() + 600_000).toLocaleString()
+    await user.save()
+
+    console.log("Sending email to:", userEmail);
     await sendMail({
         to:userEmail,
         subject:"Password Reset Request",
@@ -121,11 +128,7 @@ class AuthController{
       <p style="margin-top: 30px;">Thanks,<br>The 90's Restaurant and Bar</p>
     </div>`
     })
-
-    user.OTP=OTP.toString()
-    user.OTPGeneratedTime=new Date().toLocaleString()
-    user.OTPExpiry=new Date(Date.now() + 600_000).toLocaleString()
-    await user.save()
+    console.log("Email function completed");
 
     res.status(200).json({
         message:"An OTP is sent to the Email if Registered!"
