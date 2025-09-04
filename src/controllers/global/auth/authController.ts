@@ -4,6 +4,7 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import generateOTP from "../../../services/generateOTP";
 import sendMail from "../../../services/sendMail";
+import { now } from "sequelize/types/utils";
 class AuthController{
 
     //***********************REGISTER************************** */
@@ -134,7 +135,64 @@ class AuthController{
         message:"An OTP is sent to the Email if Registered!"
     })
 
-}
+    }
+
+    static async resetPassword(req:Request,res:Response){
+        //taking input
+        const {OTP,userEmail,newPassword,confirmNewPassword}=req.body
+
+        //validation
+        if(!OTP || !userEmail || !newPassword || !confirmNewPassword){
+            res.status(400).json({
+                message:"Please fill all the fields!"
+            })
+            return
+        }
+        //confirming email exists
+        const user=await User.findOne({where:{userEmail}})
+        if(!user){
+            res.status(400).json({
+                message:"Invalid Email or OTP!"
+            })
+            return
+        }
+
+        //OTP validation
+        if(OTP.toString() !==user.OTP){
+            res.status(400).json({
+                message:"Incorrect OTP has expired!"
+            })
+            return
+        }
+
+        //checking OTP expiry
+        if(!user.OTP || !user.OTPGeneratedTime || !user.OTPExpiry || new Date(user.OTPExpiry)<new Date()){
+            res.status(400).json({
+                message:"OTP has expired, please request a new OTP!"
+            })
+            return
+        }
+
+        //checking newPassword and confirm new Password
+        if(newPassword !== confirmNewPassword){
+            res.status(400).json({
+                message:"New Password and Confirm New Password did not match!"
+            })
+        }
+
+        //if everything goes as per terms
+        const hashedPassword=await bcrypt.hash(newPassword,10)
+        user.userPassword=hashedPassword
+        user.OTP=null,
+        user.OTPGeneratedTime=null,
+        user.OTPExpiry=null
+        user.save()
+
+        res.status(200).json({
+            message:"Password Was Changed Successfully!"
+        })
+
+    }
 
 }
 
