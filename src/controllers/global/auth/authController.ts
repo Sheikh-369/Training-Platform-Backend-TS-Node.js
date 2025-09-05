@@ -160,7 +160,7 @@ class AuthController{
         //OTP validation
         if(OTP.toString() !==user.OTP){
             res.status(400).json({
-                message:"Incorrect OTP has expired!"
+                message:"Incorrect OTP or has expired!"
             })
             return
         }
@@ -186,7 +186,7 @@ class AuthController{
         user.OTP=null,
         user.OTPGeneratedTime=null,
         user.OTPExpiry=null
-        user.save()
+        await user.save()
 
         res.status(200).json({
             message:"Password Was Changed Successfully!"
