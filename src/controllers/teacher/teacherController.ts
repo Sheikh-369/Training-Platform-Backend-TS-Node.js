@@ -22,7 +22,7 @@ const teacherLogin=async(req:Request,res:Response)=>{
     const teacher=result[0]
     if(!teacher){
         res.status(400).json({
-            message:"Invalid CrEdentials!"
+            message:"Invalid Credentials!"
         })
         return
     }

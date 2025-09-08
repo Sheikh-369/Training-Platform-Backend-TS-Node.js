@@ -5,7 +5,8 @@ import { isLoggedIn } from "../../middleware/middleware"
 const router:Router=express.Router()
 
 router.route("/institute").post(isLoggedIn,
-    asyncErrorHandler(createInstitute),asyncErrorHandler(createTeacherTable),
+    asyncErrorHandler(createInstitute),
+    asyncErrorHandler(createTeacherTable),
     asyncErrorHandler(createCourseChapterTable),
     asyncErrorHandler(createChapterLessonTable),
     asyncErrorHandler(createStudentTable),
