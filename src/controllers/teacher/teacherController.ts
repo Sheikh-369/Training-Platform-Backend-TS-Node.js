@@ -175,9 +175,11 @@ const teacherLogin = async (req: Request, res: Response) => {
   res.status(200).json({
     message: "Teacher login successful!",
     data: {
+      id: user.id,
       token,
       instituteNumber,
       teacherEmail,
+      teacherId: teacher.id //frontend ma chaiyo bhane(teacher ko personal page ma)
     },
   });
 

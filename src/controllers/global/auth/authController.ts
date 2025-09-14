@@ -72,6 +72,7 @@ class AuthController{
                 expiresIn:"30d"})
                 res.status(200).json({
                     data:{
+                        id:data[0].id,
                         token:token,
                         userName: data[0].userName,
                     },

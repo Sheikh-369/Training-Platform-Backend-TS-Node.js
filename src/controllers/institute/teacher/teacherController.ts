@@ -15,13 +15,14 @@ const createTeacher = async (req: IExtendedRequest, res: Response) => {
     teacherPhoneNumber,
     teacherExpertise,
     teacherJoinDate,
-    teacherSalary
+    teacherSalary,
+    teacherAddress
   } = req.body;
 
   const teacherImage = req.file ? req.file.path : null;
 
   //Input Validation
-  if (!teacherName || !teacherEmail || !teacherPhoneNumber || !teacherExpertise || !teacherJoinDate || !teacherSalary) {
+  if (!teacherName || !teacherEmail || !teacherPhoneNumber || !teacherExpertise || !teacherJoinDate || !teacherSalary || !teacherAddress) {
     res.status(400).json({
       message: "Please fill all the fields!"
     });
@@ -95,10 +96,22 @@ const createTeacher = async (req: IExtendedRequest, res: Response) => {
     });
   }
 
+  // Fetching institute name for teacherInstituteName field
+const result = await sequelize.query(
+  `SELECT instituteName FROM institute_${instituteNumber} WHERE instituteNumber=?`,
+  {
+    type: QueryTypes.SELECT,
+    replacements: [instituteNumber],
+  }
+) as { instituteName: string }[];
+
+const teacherInstituteName = result[0]?.instituteName || "";
+
+
   // Finally, insert into institute-specific teacher table
   await sequelize.query(
-    `INSERT INTO teacher_${instituteNumber}(teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary,teacherPassword
-    ) VALUES(?,?,?,?,?,?,?,?)`, {
+    `INSERT INTO teacher_${instituteNumber}(teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary,teacherAddress,teacherInstituteName,teacherPassword
+    ) VALUES(?,?,?,?,?,?,?,?,?,?)`, {
     type: QueryTypes.INSERT,
     replacements: [
       teacherName,
@@ -108,9 +121,43 @@ const createTeacher = async (req: IExtendedRequest, res: Response) => {
       teacherJoinDate,
       teacherImage,
       teacherSalary,
+      teacherAddress,
+      teacherInstituteName,
       passwordData.hashedVersion
     ]
   });
+
+  // // Storing teacher's personal info in a separate table
+  // await sequelize.query(`CREATE TABLE IF NOT EXISTS teacher_personal_info_${instituteNumber}(
+  //   id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  //   teacherName VARCHAR(255) NOT NULL,
+  //   teacherEmail VARCHAR(255) NOT NULL UNIQUE,
+  //   teacherPhoneNumber VARCHAR(255) NOT NULL UNIQUE,
+  //   teacherExpertise VARCHAR(255) NOT NULL,
+  //   teacherJoinDate DATE NOT NULL,
+  //   teacherSalary FLOAT NOT NULL,
+  //   teacherImage VARCHAR(255),
+  //   teacherAddress VARCHAR(255) NOT NULL,
+  //   teacherInstituteName VARCHAR(255) NOT NULL,
+  //   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  //   updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  // )`);
+  // await sequelize.query(`INSERT INTO teacher_personal_info_${instituteNumber}(
+  //   teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherSalary,teacherImage,teacherAddress,teacherInstituteName
+  // ) VALUES (?,?,?,?,?,?,?,?,?)`, {
+  //   type: QueryTypes.INSERT,
+  //   replacements: [
+  //     teacherName,
+  //     teacherEmail,
+  //     teacherPhoneNumber,
+  //     teacherExpertise,
+  //     teacherJoinDate,
+  //     teacherSalary,
+  //     teacherImage,
+  //     teacherAddress,
+  //     teacherInstituteName
+  //   ]
+  // });
 
   // Sending Email to the teacher informing he is assigned and providing his password too
   const mailInformation = {

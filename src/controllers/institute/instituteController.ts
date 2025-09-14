@@ -31,15 +31,16 @@ import { QueryTypes } from "sequelize";
             instituteAddress VARCHAR(255) NOT NULL,
             instituteVatNumber VARCHAR(255),
             institutePanNumber VARCHAR(255),
+            instituteNumber INT UNIQUE,
             createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )`)
 
             //inserting(creating institute) data in the table above
             await sequelize.query(`INSERT INTO institute_${instituteNumber}(
-                instituteName,instituteEmail,institutePhoneNumber,instituteAddress,institutePanNumber,instituteVatNumber
-                ) VALUES (?,?,?,?,?,?)`,{
-                    replacements:[instituteName,instituteEmail,institutePhoneNumber,instituteAddress,institutePanNumber,instituteVatNumber]
+                instituteName,instituteEmail,institutePhoneNumber,instituteAddress,institutePanNumber,instituteVatNumber,instituteNumber
+                ) VALUES (?,?,?,?,?,?,?)`,{
+                    replacements:[instituteName,instituteEmail,institutePhoneNumber,instituteAddress,institutePanNumber,instituteVatNumber,instituteNumber]
                 })
 //creating table to track the number of institute created by a user
         await sequelize.query(`CREATE TABLE IF NOT EXISTS user_institute (
@@ -83,6 +84,8 @@ const createTeacherTable = async (req: IExtendedRequest, res: Response, next: Ne
         teacherJoinDate DATE,
         teacherImage VARCHAR(225), 
         teacherSalary VARCHAR(100),
+        teacherAddress VARCHAR(255),
+        teacherInstituteName VARCHAR(255),
         teacherPassword VARCHAR(225),
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
