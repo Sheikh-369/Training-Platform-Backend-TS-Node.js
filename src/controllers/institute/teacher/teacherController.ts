@@ -16,7 +16,8 @@ const createTeacher = async (req: IExtendedRequest, res: Response) => {
     teacherExpertise,
     teacherJoinDate,
     teacherSalary,
-    teacherAddress
+    teacherAddress,
+    aboutTeacher
   } = req.body;
 
   const teacherImage = req.file ? req.file.path : null;
@@ -110,8 +111,8 @@ const teacherInstituteName = result[0]?.instituteName || "";
 
   // Finally, insert into institute-specific teacher table
   await sequelize.query(
-    `INSERT INTO teacher_${instituteNumber}(teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary,teacherAddress,teacherInstituteName,teacherPassword
-    ) VALUES(?,?,?,?,?,?,?,?,?,?)`, {
+    `INSERT INTO teacher_${instituteNumber}(teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary,teacherAddress,teacherInstituteName,teacherPassword,aboutTeacher
+    ) VALUES(?,?,?,?,?,?,?,?,?,?,?)`, {
     type: QueryTypes.INSERT,
     replacements: [
       teacherName,
@@ -123,41 +124,10 @@ const teacherInstituteName = result[0]?.instituteName || "";
       teacherSalary,
       teacherAddress,
       teacherInstituteName,
-      passwordData.hashedVersion
+      passwordData.hashedVersion,
+      aboutTeacher || "Hi, I am new here!"
     ]
   });
-
-  // // Storing teacher's personal info in a separate table
-  // await sequelize.query(`CREATE TABLE IF NOT EXISTS teacher_personal_info_${instituteNumber}(
-  //   id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  //   teacherName VARCHAR(255) NOT NULL,
-  //   teacherEmail VARCHAR(255) NOT NULL UNIQUE,
-  //   teacherPhoneNumber VARCHAR(255) NOT NULL UNIQUE,
-  //   teacherExpertise VARCHAR(255) NOT NULL,
-  //   teacherJoinDate DATE NOT NULL,
-  //   teacherSalary FLOAT NOT NULL,
-  //   teacherImage VARCHAR(255),
-  //   teacherAddress VARCHAR(255) NOT NULL,
-  //   teacherInstituteName VARCHAR(255) NOT NULL,
-  //   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  //   updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-  // )`);
-  // await sequelize.query(`INSERT INTO teacher_personal_info_${instituteNumber}(
-  //   teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherSalary,teacherImage,teacherAddress,teacherInstituteName
-  // ) VALUES (?,?,?,?,?,?,?,?,?)`, {
-  //   type: QueryTypes.INSERT,
-  //   replacements: [
-  //     teacherName,
-  //     teacherEmail,
-  //     teacherPhoneNumber,
-  //     teacherExpertise,
-  //     teacherJoinDate,
-  //     teacherSalary,
-  //     teacherImage,
-  //     teacherAddress,
-  //     teacherInstituteName
-  //   ]
-  // });
 
   // Sending Email to the teacher informing he is assigned and providing his password too
   const mailInformation = {
@@ -231,20 +201,20 @@ const deleteTeacher=async(req:IExtendedRequest,res:Response)=>{
 const updateTeacher=async(req:IExtendedRequest,res:Response)=>{
     const instituteNumber=req.user?.currentInstituteNumber
     const id=req.params.id
-    const {teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherSalary}=req.body
+    const {teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherSalary,teacherAddress,aboutTeacher}=req.body
 
     const teacherImage=req.file?req.file.path:null
 
-    if(!teacherName || !teacherEmail || !teacherPhoneNumber || !teacherExpertise || !teacherSalary || !teacherJoinDate){
+    if(!teacherName || !teacherEmail || !teacherPhoneNumber || !teacherExpertise || !teacherSalary || !teacherJoinDate || !teacherAddress || !aboutTeacher){
         res.status(400).json({
             message:"Please fill all the fields!"
         })
         return
     }
 
-    await sequelize.query(`UPDATE teacher_${instituteNumber} SET teacherName=?,teacherEmail=?,teacherPhoneNumber=?,teacherExpertise=?,teacherSalary=?,teacherImage=?,teacherJoinDate=? WHERE id=?`,{
+    await sequelize.query(`UPDATE teacher_${instituteNumber} SET teacherName=?,teacherEmail=?,teacherPhoneNumber=?,teacherExpertise=?,teacherSalary=?,teacherImage=?,teacherJoinDate=?,teacherAddress=?,aboutTeacher=? WHERE id=?`,{
         type:QueryTypes.UPDATE,
-        replacements:[teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherSalary,teacherImage,teacherJoinDate,id]
+        replacements:[teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherSalary,teacherImage,teacherJoinDate,teacherAddress,aboutTeacher,id]
     })
     res.status(200).json({
         message:"Teacher Updated Successfully!"

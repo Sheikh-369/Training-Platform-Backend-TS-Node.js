@@ -22,7 +22,7 @@ router.route("/teacher/:id").delete(isLoggedIn,
     asyncErrorHandler(deleteTeacher))
 
 router.route("/teacher/:id").patch(isLoggedIn,
-    accessTo(Role.Institute),
+    accessTo(Role.Institute,Role.Teacher),
     upload.single("teacherImage"),
     asyncErrorHandler(updateTeacher))
 
