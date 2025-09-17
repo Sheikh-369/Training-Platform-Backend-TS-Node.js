@@ -203,7 +203,9 @@ const updateTeacher=async(req:IExtendedRequest,res:Response)=>{
     const id=req.params.id
     const {teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherAddress,aboutTeacher}=req.body
 
-    const teacherImage=req.file?req.file.path:null
+    // const teacherImage=req.file?req.file.path:null
+    const teacherImage = req.file?.path || req.body.teacherImage || null;
+
 
     if(!teacherName || !teacherEmail || !teacherPhoneNumber || !teacherExpertise || !teacherAddress || !aboutTeacher){
         res.status(400).json({
