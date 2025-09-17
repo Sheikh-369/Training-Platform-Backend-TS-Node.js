@@ -201,20 +201,20 @@ const deleteTeacher=async(req:IExtendedRequest,res:Response)=>{
 const updateTeacher=async(req:IExtendedRequest,res:Response)=>{
     const instituteNumber=req.user?.currentInstituteNumber
     const id=req.params.id
-    const {teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherSalary,teacherAddress,aboutTeacher}=req.body
+    const {teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherAddress,aboutTeacher}=req.body
 
     const teacherImage=req.file?req.file.path:null
 
-    if(!teacherName || !teacherEmail || !teacherPhoneNumber || !teacherExpertise || !teacherSalary || !teacherJoinDate || !teacherAddress || !aboutTeacher){
+    if(!teacherName || !teacherEmail || !teacherPhoneNumber || !teacherExpertise || !teacherAddress || !aboutTeacher){
         res.status(400).json({
             message:"Please fill all the fields!"
         })
         return
     }
 
-    await sequelize.query(`UPDATE teacher_${instituteNumber} SET teacherName=?,teacherEmail=?,teacherPhoneNumber=?,teacherExpertise=?,teacherSalary=?,teacherImage=?,teacherJoinDate=?,teacherAddress=?,aboutTeacher=? WHERE id=?`,{
+    await sequelize.query(`UPDATE teacher_${instituteNumber} SET teacherName=?,teacherEmail=?,teacherPhoneNumber=?,teacherExpertise=?,teacherImage=?,teacherAddress=?,aboutTeacher=? WHERE id=?`,{
         type:QueryTypes.UPDATE,
-        replacements:[teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherSalary,teacherImage,teacherJoinDate,teacherAddress,aboutTeacher,id]
+        replacements:[teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherImage,teacherAddress,aboutTeacher,id]
     })
     res.status(200).json({
         message:"Teacher Updated Successfully!"
