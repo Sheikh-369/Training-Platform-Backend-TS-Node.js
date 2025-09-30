@@ -13,6 +13,9 @@ import { QueryTypes } from "sequelize";
         const {instituteName,instituteEmail,institutePhoneNumber,instituteAddress}=req.body
         const institutePanNumber=req.body.institutePanNumber || null
         const instituteVatNumber=req.body.instituteVatNumber || null
+        //for institue cover page.
+        const instituteImage=req.file?req.file.path:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGVkdWNhdGlvbnxlbnwwfHwwfHx8MA%3D%3D"
+
         if(!instituteName || !instituteEmail || !institutePhoneNumber || !instituteAddress){
             res.status(400).json({
                 message:"All the fields are mandatory!"
@@ -32,15 +35,16 @@ import { QueryTypes } from "sequelize";
             instituteVatNumber VARCHAR(255),
             institutePanNumber VARCHAR(255),
             instituteNumber INT UNIQUE,
+            instituteImage VARCHAR(255),
             createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )`)
 
             //inserting(creating institute) data in the table above
             await sequelize.query(`INSERT INTO institute_${instituteNumber}(
-                instituteName,instituteEmail,institutePhoneNumber,instituteAddress,institutePanNumber,instituteVatNumber,instituteNumber
-                ) VALUES (?,?,?,?,?,?,?)`,{
-                    replacements:[instituteName,instituteEmail,institutePhoneNumber,instituteAddress,institutePanNumber,instituteVatNumber,instituteNumber]
+                instituteName,instituteEmail,institutePhoneNumber,instituteAddress,institutePanNumber,instituteVatNumber,instituteNumber,instituteImage
+                ) VALUES (?,?,?,?,?,?,?,?)`,{
+                    replacements:[instituteName,instituteEmail,institutePhoneNumber,instituteAddress,institutePanNumber,instituteVatNumber,instituteNumber,instituteImage]
                 })
 //creating table to track the number of institute created by a user
         await sequelize.query(`CREATE TABLE IF NOT EXISTS user_institute (

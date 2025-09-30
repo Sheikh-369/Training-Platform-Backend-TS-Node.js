@@ -2,9 +2,11 @@ import express, { Router } from "express"
 import { createCategoryTable, createChapterLessonTable, createCourseChapterTable, createCourseTable, createInstitute, createStudentTable, createTeacherTable } from "../../controllers/institute/instituteController"
 import asyncErrorHandler from "../../services/asyncErrorHandler"
 import { isLoggedIn } from "../../middleware/middleware"
+import upload from "../../middleware/multerUpload"
 const router:Router=express.Router()
 
 router.route("/institute").post(isLoggedIn,
+    upload.single("instituteImage"),
     asyncErrorHandler(createInstitute),
     asyncErrorHandler(createTeacherTable),
     asyncErrorHandler(createCourseChapterTable),
