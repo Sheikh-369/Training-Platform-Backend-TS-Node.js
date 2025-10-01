@@ -111,8 +111,8 @@ const teacherInstituteName = result[0]?.instituteName || "";
 
   // Finally, insert into institute-specific teacher table
   await sequelize.query(
-    `INSERT INTO teacher_${instituteNumber}(teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary,teacherAddress,teacherInstituteName,teacherPassword,aboutTeacher
-    ) VALUES(?,?,?,?,?,?,?,?,?,?,?)`, {
+    `INSERT INTO teacher_${instituteNumber}(teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherJoinDate,teacherImage,teacherSalary,teacherAddress,instituteNumber,teacherInstituteName,teacherPassword,aboutTeacher
+    ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`, {
     type: QueryTypes.INSERT,
     replacements: [
       teacherName,
@@ -123,6 +123,7 @@ const teacherInstituteName = result[0]?.instituteName || "";
       teacherImage,
       teacherSalary,
       teacherAddress,
+      instituteNumber,
       teacherInstituteName,
       passwordData.hashedVersion,
       aboutTeacher || "Hi, I am new here!"
@@ -174,10 +175,13 @@ const getAllTeachers=async(req:IExtendedRequest,res:Response)=>{
 }
 
 const getSingleTeacher=async(req:IExtendedRequest,res:Response)=>{
-    const instituteNumber=req.user?.currentInstituteNumber
+    // const instituteNumber=req.user?.currentInstituteNumber
+    const instituteNumber = req.params.instituteNumber
+
     const teacherId=req.params.id
-    const teacher=await sequelize.query(`SELECT * FROM teacher_${instituteNumber} WHERE id=?`,{
-        replacements:[teacherId],
+    console.log('Fetching teacher:', { teacherId, instituteNumber });
+    const teacher=await sequelize.query(`SELECT * FROM teacher_${instituteNumber} WHERE id=? AND instituteNumber=?`,{
+        replacements:[teacherId,instituteNumber],
         type:QueryTypes.SELECT
     })
     res.status(200).json({
@@ -199,8 +203,9 @@ const deleteTeacher=async(req:IExtendedRequest,res:Response)=>{
 }
 
 const updateTeacher=async(req:IExtendedRequest,res:Response)=>{
-    const instituteNumber=req.user?.currentInstituteNumber
-    const id=req.params.id
+    // const instituteNumber=req.user?.currentInstituteNumber
+    // const id=req.params.id
+    const { instituteNumber, id } = req.params;
     const {teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherAddress,aboutTeacher}=req.body
 
     // const teacherImage=req.file?req.file.path:null
@@ -214,9 +219,9 @@ const updateTeacher=async(req:IExtendedRequest,res:Response)=>{
         return
     }
 
-    await sequelize.query(`UPDATE teacher_${instituteNumber} SET teacherName=?,teacherEmail=?,teacherPhoneNumber=?,teacherExpertise=?,teacherImage=?,teacherAddress=?,aboutTeacher=? WHERE id=?`,{
+    await sequelize.query(`UPDATE teacher_${instituteNumber} SET teacherName=?,teacherEmail=?,teacherPhoneNumber=?,teacherExpertise=?,teacherImage=?,teacherAddress=?,aboutTeacher=? WHERE id=? AND instituteNumber=?`,{
         type:QueryTypes.UPDATE,
-        replacements:[teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherImage,teacherAddress,aboutTeacher,id]
+        replacements:[teacherName,teacherEmail,teacherPhoneNumber,teacherExpertise,teacherImage,teacherAddress,aboutTeacher,id,instituteNumber]
     })
     res.status(200).json({
         message:"Teacher Updated Successfully!"

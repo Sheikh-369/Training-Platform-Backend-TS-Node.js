@@ -89,6 +89,7 @@ const createTeacherTable = async (req: IExtendedRequest, res: Response, next: Ne
         teacherImage VARCHAR(225), 
         teacherSalary VARCHAR(100),
         teacherAddress VARCHAR(255),
+        instituteNumber VARCHAR(10),
         teacherInstituteName VARCHAR(255),
         teacherPassword VARCHAR(225),
         aboutTeacher TEXT,

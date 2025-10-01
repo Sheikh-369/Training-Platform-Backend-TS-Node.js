@@ -14,14 +14,14 @@ router.route("/teacher").post(isLoggedIn,
 router.route("/teacher").get(isLoggedIn,
     asyncErrorHandler(getAllTeachers))
 
-router.route("/teacher/:id").get(isLoggedIn,
+router.route("/teacher/:instituteNumber/:id").get(isLoggedIn,
     asyncErrorHandler(getSingleTeacher))
 
 router.route("/teacher/:id").delete(isLoggedIn,
     accessTo(Role.Institute),
     asyncErrorHandler(deleteTeacher))
 
-router.route("/teacher/:id").patch(isLoggedIn,
+router.route("/teacher/:instituteNumber/:id").patch(isLoggedIn,
     accessTo(Role.Institute,Role.Teacher),
     upload.single("teacherImage"),
     asyncErrorHandler(updateTeacher))
