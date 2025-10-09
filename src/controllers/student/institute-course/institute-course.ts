@@ -90,7 +90,7 @@ const instituteCourseListForStudent = async (req: Request, res: Response) => {
 
     if (datas.length == 0) {
         res.status(404).json({
-            message: "No courses found of that institute"
+            message: "No courses found of that institute",
         });
     } else {
         res.status(200).json({

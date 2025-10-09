@@ -29,7 +29,7 @@ class UserInstituteRole extends Model {
   declare instituteNumber: string;
 
   @Column({
-    type: DataType.ENUM("teacher", "student", "admin", "super-admin"),
+    type: DataType.ENUM("teacher", "student", "institute", "super-admin"),
     allowNull: false
   })
   declare role: string;

@@ -5,6 +5,7 @@ import { IExtendedRequest } from "../../middleware/type";
 import User from "../../database/models/userModel";
 import categories from "../../services/seed";
 import { QueryTypes } from "sequelize";
+import UserInstituteRole from "../../database/models/userInstituteRoleModel";
 
 
 
@@ -68,9 +69,17 @@ import { QueryTypes } from "sequelize";
                 id: req.user.id
             }
         });
+
+        //inserting owner's data into role based record of an institute
+        await UserInstituteRole.create({
+            userId:req.user.id,
+            instituteNumber:req.user.currentInstituteNumber,
+            role:"institute"
+        })
     }
+    //passing the same institute number wherever needed
     if(req.user){
-              req.user.currentInstituteNumber = instituteNumber//passing the same number
+              req.user.currentInstituteNumber = instituteNumber
           }
     next()
     
