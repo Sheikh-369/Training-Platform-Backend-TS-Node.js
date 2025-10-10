@@ -6,6 +6,7 @@ import User from "../../database/models/userModel";
 import categories from "../../services/seed";
 import { QueryTypes } from "sequelize";
 import UserInstituteRole from "../../database/models/userInstituteRoleModel";
+// import { SELECT } from "sequelize/types/query-types";
 
 
 
@@ -197,7 +198,35 @@ const createCourseTable = async (req: IExtendedRequest, res: Response) => {
     });       
 };
 
-    
+const fetchSingleInstitute = async (req: IExtendedRequest, res: Response) => {
+  const instituteNumber = req.user?.currentInstituteNumber;
+
+  if (!instituteNumber) {
+    return res.status(400).json({
+      message: "Institute number not found on user object",
+    });
+  }
+
+  const data = await sequelize.query(
+    `SELECT * FROM institute_${instituteNumber} WHERE instituteNumber = ?`,
+    {
+      type: QueryTypes.SELECT,
+      replacements: [instituteNumber],
+    }
+  );
+
+  if (!data || data.length === 0) {
+    return res.status(404).json({
+      message: "Institute does not exist.",
+    });
+  }
+
+  res.status(200).json({
+    message: `Institute_${instituteNumber} fetched successfully.`,
+    data,
+  });
+};
+   
 
 export {createInstitute,
     createTeacherTable,
@@ -205,4 +234,4 @@ export {createInstitute,
     createChapterLessonTable,
     createCourseTable,
     createCategoryTable,
-    createStudentTable}
+    createStudentTable,fetchSingleInstitute}
