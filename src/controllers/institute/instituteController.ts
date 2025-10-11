@@ -49,18 +49,50 @@ import UserInstituteRole from "../../database/models/userInstituteRoleModel";
                     replacements:[instituteName,instituteEmail,institutePhoneNumber,instituteAddress,institutePanNumber,instituteVatNumber,instituteNumber,instituteImage]
                 })
 //creating table to track the number of institute created by a user
-        await sequelize.query(`CREATE TABLE IF NOT EXISTS user_institute (
-        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-        userId VARCHAR(255) REFERENCES user(id),
-        instituteNumber INT UNIQUE
-    )`);
+        await sequelize.query(`
+            CREATE TABLE IF NOT EXISTS user_institute (
+                id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                userId VARCHAR(255) REFERENCES users(id),
+                instituteNumber INT UNIQUE NOT NULL,
+                instituteName VARCHAR(255) NOT NULL,
+                instituteEmail VARCHAR(255) NOT NULL,
+                institutePhoneNumber VARCHAR(255) NOT NULL,
+                instituteAddress VARCHAR(255) NOT NULL,
+                institutePanNumber VARCHAR(255),
+                instituteVatNumber VARCHAR(255),
+                instituteImage VARCHAR(255),
+                createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )`);
+
     //if a user creates more than one institute
     if (req.user) {
-        await sequelize.query(`INSERT INTO user_institute (
-            userId, instituteNumber
-        ) VALUES (?, ?)`, {
-            replacements: [req.user.id, instituteNumber]
-        });
+        await sequelize.query(`
+            INSERT INTO user_institute (
+                userId,
+                instituteNumber,
+                instituteName,
+                instituteEmail,
+                institutePhoneNumber,
+                instituteAddress,
+                institutePanNumber,
+                instituteVatNumber,
+                instituteImage
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `, {
+            replacements: [
+                req.user.id,
+                instituteNumber,
+                instituteName,
+                instituteEmail,
+                institutePhoneNumber,
+                instituteAddress,
+                institutePanNumber,
+                instituteVatNumber,
+                instituteImage
+            ]
+            });
+
         //tracking user's intitute info
         await User.update({
             currentInstituteNumber: instituteNumber,
@@ -74,8 +106,11 @@ import UserInstituteRole from "../../database/models/userInstituteRoleModel";
         //inserting owner's data into role based record of an institute
         await UserInstituteRole.create({
             userId:req.user.id,
-            instituteNumber:req.user.currentInstituteNumber,
-            role:"institute"
+            instituteNumber,
+            role:"institute",
+            instituteName,
+            instituteAddress,
+            instituteImage
         })
     }
     //passing the same institute number wherever needed
@@ -198,6 +233,7 @@ const createCourseTable = async (req: IExtendedRequest, res: Response) => {
     });       
 };
 
+//fetch institute by institute number
 const fetchSingleInstitute = async (req: IExtendedRequest, res: Response) => {
   const instituteNumber = req.user?.currentInstituteNumber;
 
