@@ -262,7 +262,81 @@ const fetchSingleInstitute = async (req: IExtendedRequest, res: Response) => {
     data,
   });
 };
-   
+
+//edit institute by institute number
+const editInstituteInfo = async (req: IExtendedRequest, res: Response) => {
+  const instituteNumber = req.user?.currentInstituteNumber;
+
+  const {
+    instituteName,
+    instituteEmail,
+    institutePhoneNumber,
+    instituteAddress,
+    institutePanNumber,
+    instituteVatNumber
+  } = req.body;
+
+  if (!instituteName || !instituteEmail || !institutePhoneNumber || !instituteAddress) {
+    return res.status(400).json({
+      message: "Please provide all required fields!",
+    });
+  }
+
+  // Define row type
+  type InstituteRow = {
+    instituteImage: string;
+  };
+
+  // Run query and extract result
+  const result = await sequelize.query(
+    `SELECT instituteImage FROM institute_${instituteNumber} WHERE instituteNumber = ?`,
+    {
+      replacements: [instituteNumber],
+    }
+  );
+
+  // Safely extract rows from result
+  const rows = result[0] as InstituteRow[];
+
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return res.status(404).json({ message: "Institute not found." });
+  }
+
+  const existingImage = rows[0].instituteImage;
+  const instituteImage = req.file?.path || existingImage;
+
+  await sequelize.query(
+    `UPDATE institute_${instituteNumber}
+     SET 
+       instituteName = ?,
+       instituteEmail = ?,
+       institutePhoneNumber = ?,
+       instituteAddress = ?,
+       institutePanNumber = ?,
+       instituteVatNumber = ?,
+       instituteImage = ?
+     WHERE instituteNumber = ?`,
+    {
+      replacements: [
+        instituteName,
+        instituteEmail,
+        institutePhoneNumber,
+        instituteAddress,
+        institutePanNumber || null,
+        instituteVatNumber || null,
+        instituteImage,
+        instituteNumber,
+      ],
+    }
+  );
+
+  return res.status(200).json({ message: "Institute updated successfully." });
+};
+
+
+
+
+
 
 export {createInstitute,
     createTeacherTable,
@@ -270,4 +344,4 @@ export {createInstitute,
     createChapterLessonTable,
     createCourseTable,
     createCategoryTable,
-    createStudentTable,fetchSingleInstitute}
+    createStudentTable,fetchSingleInstitute,editInstituteInfo}
