@@ -1,17 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import sequelize from "../../database/connection";
 import generateRandomInstituteNumber from "../../services/randomNumberGenerator";
-import { IExtendedRequest } from "../../middleware/type";
-import User from "../../database/models/userModel";
 import categories from "../../services/seed";
 import { QueryTypes } from "sequelize";
 import UserInstituteRole from "../../database/models/userInstituteRoleModel";
-// import { SELECT } from "sequelize/types/query-types";
+import { IExtendedRequest } from "../../middleware/type";
 
 
 
     //input from user/body
-    const createInstitute=async (req:IExtendedRequest,res:Response,next:NextFunction)=>{
+const createInstitute=async (req:IExtendedRequest,res:Response,next:NextFunction)=>{
         const {instituteName,instituteEmail,institutePhoneNumber,instituteAddress}=req.body
         const institutePanNumber=req.body.institutePanNumber || null
         const instituteVatNumber=req.body.instituteVatNumber || null
@@ -94,14 +92,14 @@ import UserInstituteRole from "../../database/models/userInstituteRoleModel";
             });
 
         //tracking user's intitute info
-        await User.update({
-            currentInstituteNumber: instituteNumber,
-            role: "institute"
-        }, {
-            where: {
-                id: req.user.id
-            }
-        });
+        // await User.update({
+        //     currentInstituteNumber: instituteNumber,
+        //     role: "institute"
+        // }, {
+        //     where: {
+        //         id: req.user.id
+        //     }
+        // });
 
         //inserting owner's data into role based record of an institute
         await UserInstituteRole.create({
@@ -114,16 +112,21 @@ import UserInstituteRole from "../../database/models/userInstituteRoleModel";
         })
     }
     //passing the same institute number wherever needed
-    if(req.user){
-              req.user.currentInstituteNumber = instituteNumber
-          }
+    // if(req.user){
+    //           req.user.currentInstituteNumber = instituteNumber
+    //       }
+    if (req.user) {
+      req.instituteNumber = String(instituteNumber); // Set explicitly
+    }
+
     next()
     
 };        
 
 const createTeacherTable = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
     // the number for the institute to create tables simultaneously
-    const instituteNumber=req.user?.currentInstituteNumber
+    // const instituteNumber=req.user?.currentInstituteNumber
+    const instituteNumber=req.instituteNumber
     await sequelize.query(`CREATE TABLE IF NOT EXISTS teacher_${instituteNumber} (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
         teacherName VARCHAR(255) NOT NULL,
@@ -136,7 +139,8 @@ const createTeacherTable = async (req: IExtendedRequest, res: Response, next: Ne
         teacherAddress VARCHAR(255),
         instituteNumber VARCHAR(10),
         teacherInstituteName VARCHAR(255),
-        teacherPassword VARCHAR(225),
+        teacherInstituteAddress VARCHAR(255),
+        teacherInstituteImage VARCHAR(255),
         aboutTeacher TEXT,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -146,7 +150,8 @@ const createTeacherTable = async (req: IExtendedRequest, res: Response, next: Ne
 
 //teacher activities-creating chapter
 const createCourseChapterTable=async(req:IExtendedRequest,res:Response,next:NextFunction)=>{
-    const instituteNumber=req.user?.currentInstituteNumber
+    // const instituteNumber=req.user?.currentInstituteNumber
+    const instituteNumber=req.instituteNumber
     await sequelize.query(`CREATE TABLE IF NOT EXISTS course_chapter_${instituteNumber}(
         id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
         chapterName VARCHAR(200) NOT NULL,
@@ -160,7 +165,8 @@ const createCourseChapterTable=async(req:IExtendedRequest,res:Response,next:Next
 
 //teacher activity-2. creating lesson
 const createChapterLessonTable=async(req:IExtendedRequest,res:Response,next:NextFunction)=>{
-    const instituteNumber=req.user?.currentInstituteNumber
+    // const instituteNumber=req.user?.currentInstituteNumber
+    const instituteNumber=req.instituteNumber
     await sequelize.query(`CREATE TABLE IF NOT EXISTS chapter_lesson_${instituteNumber}(
         id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
         lessonName VARCHAR(225) NOT NULL,
@@ -175,14 +181,20 @@ const createChapterLessonTable=async(req:IExtendedRequest,res:Response,next:Next
 }
 
 const createStudentTable = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
-    const instituteNumber=req.user?.currentInstituteNumber
+    // const instituteNumber=req.user?.currentInstituteNumber
+    const instituteNumber=req.instituteNumber
     await sequelize.query(`CREATE TABLE IF NOT EXISTS student_${instituteNumber} (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
         studentName VARCHAR(255) NOT NULL,
-        studentPhoneNo VARCHAR(255) NOT NULL UNIQUE,
+        studentEmail VARCHAR(100) NOT NULL UNIQUE,
+        studentPhoneNo VARCHAR(255) NOT NULL,
         studentAddress TEXT, 
         enrolledDate DATE, 
         studentImage VARCHAR(255),
+        aboutStudent TEXT,
+        studentInstituteName VARCHAR(100),
+        studentInstituteAddress TEXT,
+        studentInstituteImage VARCHAR(250),
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP 
     )`);
@@ -190,8 +202,8 @@ const createStudentTable = async (req: IExtendedRequest, res: Response, next: Ne
 };
 
 const createCategoryTable = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
-    const instituteNumber = req.user?.currentInstituteNumber;
-
+    // const instituteNumber = req.user?.currentInstituteNumber;
+    const instituteNumber=req.instituteNumber
     await sequelize.query(`CREATE TABLE IF NOT EXISTS category_${instituteNumber} (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
         categoryName VARCHAR(255) NOT NULL UNIQUE,
@@ -212,7 +224,8 @@ const createCategoryTable = async (req: IExtendedRequest, res: Response, next: N
 
 
 const createCourseTable = async (req: IExtendedRequest, res: Response) => {
-    const instituteNumber=req.user?.currentInstituteNumber
+    // const instituteNumber=req.user?.currentInstituteNumber
+    const instituteNumber=req.instituteNumber
     await sequelize.query(`CREATE TABLE IF NOT EXISTS course_${instituteNumber} (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
         courseName VARCHAR(255) NOT NULL UNIQUE,
@@ -236,6 +249,7 @@ const createCourseTable = async (req: IExtendedRequest, res: Response) => {
 //fetch institute by institute number
 const fetchSingleInstitute = async (req: IExtendedRequest, res: Response) => {
   const instituteNumber = req.user?.currentInstituteNumber;
+  // const instituteNumber=req.instituteNumber
 
   if (!instituteNumber) {
     return res.status(400).json({
@@ -263,58 +277,168 @@ const fetchSingleInstitute = async (req: IExtendedRequest, res: Response) => {
   });
 };
 
-//edit institute by institute number
-const editInstituteInfo = async (req: IExtendedRequest, res: Response) => {
-  const instituteNumber = req.user?.currentInstituteNumber;
 
+//fetching institute details
+export const fetchInstituteDetails = async (req: IExtendedRequest, res: Response) => {
+  const userId = req.user?.id;
+  const instituteNumber = req.params.instituteNumber as string;
+
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  if (!instituteNumber) {
+    return res.status(400).json({ message: "Institute number is required" });
+  }
+
+  // 🔍 Query the user_institute table directly
+  const [institute] = await sequelize.query(
+    `
+    SELECT 
+      instituteNumber,
+      instituteName,
+      instituteEmail,
+      institutePhoneNumber,
+      instituteAddress,
+      institutePanNumber,
+      instituteVatNumber,
+      instituteImage,
+      createdAt
+    FROM user_institute
+    WHERE userId = ? AND instituteNumber = ?
+    LIMIT 1
+    `,
+    {
+      replacements: [userId, instituteNumber],
+      type: QueryTypes.SELECT
+    }
+  );
+
+  if (!institute) {
+    return res.status(404).json({
+      message: "Institute not found or not associated with this user"
+    });
+  }
+
+  return res.status(200).json({
+    message: "Institute details fetched successfully",
+    data: institute
+  });
+};
+
+
+//edit institute by institute number
+// const editInstituteInfo = async (req: IExtendedRequest, res: Response) => {
+//   const instituteNumber = req.user?.currentInstituteNumber;
+// // const instituteNumber=req.instituteNumber
+//   const {
+//     instituteName,
+//     instituteEmail,
+//     institutePhoneNumber,
+//     instituteAddress,
+//     institutePanNumber,
+//     instituteVatNumber
+//   } = req.body;
+
+//   if (!instituteName || !instituteEmail || !institutePhoneNumber || !instituteAddress) {
+//     return res.status(400).json({
+//       message: "Please provide all required fields!",
+//     });
+//   }
+
+//   // Define row type
+//   type InstituteRow = {
+//     instituteImage: string;
+//   };
+
+//   // Run query and extract result
+//   const result = await sequelize.query(
+//     `SELECT instituteImage FROM institute_${instituteNumber} WHERE instituteNumber = ?`,
+//     {
+//       replacements: [instituteNumber],
+//     }
+//   );
+
+//   // Safely extract rows from result
+//   const rows = result[0] as InstituteRow[];
+
+//   if (!Array.isArray(rows) || rows.length === 0) {
+//     return res.status(404).json({ message: "Institute not found." });
+//   }
+
+//   const existingImage = rows[0].instituteImage;
+//   const instituteImage = req.file?.path || existingImage;
+
+//   await sequelize.query(
+//     `UPDATE institute_${instituteNumber}
+//      SET 
+//        instituteName = ?,
+//        instituteEmail = ?,
+//        institutePhoneNumber = ?,
+//        instituteAddress = ?,
+//        institutePanNumber = ?,
+//        instituteVatNumber = ?,
+//        instituteImage = ?
+//      WHERE instituteNumber = ?`,
+//     {
+//       replacements: [
+//         instituteName,
+//         instituteEmail,
+//         institutePhoneNumber,
+//         instituteAddress,
+//         institutePanNumber || null,
+//         instituteVatNumber || null,
+//         instituteImage,
+//         instituteNumber,
+//       ],
+//     }
+//   );
+
+//   return res.status(200).json({ message: "Institute updated successfully." });
+// };
+
+const editInstituteInfo =async (req: IExtendedRequest, res: Response, next: NextFunction) => {
   const {
     instituteName,
     instituteEmail,
     institutePhoneNumber,
     instituteAddress,
-    institutePanNumber,
-    instituteVatNumber
+    institutePanNumber = null,
+    instituteVatNumber = null,
+    instituteNumber
   } = req.body;
 
-  if (!instituteName || !instituteEmail || !institutePhoneNumber || !instituteAddress) {
-    return res.status(400).json({
-      message: "Please provide all required fields!",
-    });
-  }
+  // ✅ 1. Handle image
+  let instituteImage: string;
 
-  // Define row type
-  type InstituteRow = {
-    instituteImage: string;
-  };
+  if (req.file?.path) {
+    instituteImage = req.file.path;
+  } else {
+    const [existingInstitute]: any = await sequelize.query(
+      `SELECT instituteImage FROM user_institute WHERE instituteNumber = ?`,
+      {
+        replacements: [instituteNumber],
+        type:QueryTypes.SELECT
+      }
+    );
 
-  // Run query and extract result
-  const result = await sequelize.query(
-    `SELECT instituteImage FROM institute_${instituteNumber} WHERE instituteNumber = ?`,
-    {
-      replacements: [instituteNumber],
+    if (!existingInstitute?.instituteImage) {
+      return res.status(404).json({ message: "Institute not found or image missing." });
     }
-  );
 
-  // Safely extract rows from result
-  const rows = result[0] as InstituteRow[];
-
-  if (!Array.isArray(rows) || rows.length === 0) {
-    return res.status(404).json({ message: "Institute not found." });
+    instituteImage = existingInstitute.instituteImage;
   }
 
-  const existingImage = rows[0].instituteImage;
-  const instituteImage = req.file?.path || existingImage;
+  // ✅ 2. Start transaction
+  const transaction = await sequelize.transaction();
 
+  // ✅ 3. Update all three tables
+  // 1. Update `user_institute`
   await sequelize.query(
-    `UPDATE institute_${instituteNumber}
-     SET 
-       instituteName = ?,
-       instituteEmail = ?,
-       institutePhoneNumber = ?,
-       instituteAddress = ?,
-       institutePanNumber = ?,
-       instituteVatNumber = ?,
-       instituteImage = ?
+    `UPDATE user_institute 
+     SET instituteName = ?, instituteEmail = ?, institutePhoneNumber = ?, 
+         instituteAddress = ?, institutePanNumber = ?, instituteVatNumber = ?, 
+         instituteImage = ?, updatedAt = CURRENT_TIMESTAMP 
      WHERE instituteNumber = ?`,
     {
       replacements: [
@@ -322,17 +446,58 @@ const editInstituteInfo = async (req: IExtendedRequest, res: Response) => {
         instituteEmail,
         institutePhoneNumber,
         instituteAddress,
-        institutePanNumber || null,
-        instituteVatNumber || null,
+        institutePanNumber,
+        instituteVatNumber,
         instituteImage,
-        instituteNumber,
+        instituteNumber
       ],
+      transaction
     }
   );
 
-  return res.status(200).json({ message: "Institute updated successfully." });
-};
+  // 2. Update dynamic institute table: `institute_<number>`
+  await sequelize.query(
+    `UPDATE institute_${instituteNumber}
+     SET instituteName = ?, instituteEmail = ?, institutePhoneNumber = ?, 
+         instituteAddress = ?, institutePanNumber = ?, instituteVatNumber = ?, 
+         instituteImage = ?, updatedAt = CURRENT_TIMESTAMP 
+     WHERE instituteNumber = ?`,
+    {
+      replacements: [
+        instituteName,
+        instituteEmail,
+        institutePhoneNumber,
+        instituteAddress,
+        institutePanNumber,
+        instituteVatNumber,
+        instituteImage,
+        instituteNumber
+      ],
+      transaction
+    }
+  );
 
+  // 3. Update `userInstituteRoles` (optional fields)
+  await UserInstituteRole.update(
+    {
+      instituteName,
+      instituteAddress,
+      instituteImage
+    },
+    {
+      where: { instituteNumber },
+      transaction
+    }
+  );
+
+  // ✅ 4. Commit
+  await transaction.commit();
+
+  res.status(200).json({
+    message: "Institute updated in all tables successfully.",
+    instituteImage
+  });
+};
 
 
 

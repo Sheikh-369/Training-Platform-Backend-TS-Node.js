@@ -2,16 +2,24 @@ import express, { Router } from "express"
 import asyncErrorHandler from "../../../services/asyncErrorHandler"
 import { createCourse, deleteCourse, getAllCourses, getSingleCourse, updateCourse } from "../../../controllers/institute/course/courseController"
 import upload from "../../../middleware/multerUpload"
-import { accessTo, isLoggedIn, Role } from "../../../middleware/middleware"
+import { accessTo, isLoggedIn } from "../../../middleware/middleware"
+import { Role } from "../../../types/role"
 
 const router:Router=express.Router()
 
-router.route("/course").post(isLoggedIn,
+router.route("/:instituteNumber/course").post(
+    isLoggedIn,
     accessTo(Role.Institute),
     upload.single("courseThumbnail"),
     asyncErrorHandler(createCourse))
 
-router.route("/course").get(isLoggedIn,
+router.route("/:instituteNumber/course").get(
+    isLoggedIn,
+    asyncErrorHandler(getAllCourses))
+
+//for institute dashboard
+router.route("/:instituteNumber/course").get(
+    isLoggedIn,
     asyncErrorHandler(getAllCourses))
 
 router.route("/course/:id").get(isLoggedIn,

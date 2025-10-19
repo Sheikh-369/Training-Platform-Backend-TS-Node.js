@@ -2,22 +2,23 @@ import express, { Router } from "express"
 import { createTeacher, deleteTeacher, getAllTeachers, getSingleTeacher, updateTeacher } from "../../../controllers/institute/teacher/teacherController"
 import asyncErrorHandler from "../../../services/asyncErrorHandler"
 import upload from "../../../middleware/multerUpload"
-import { accessTo, isLoggedIn, Role } from "../../../middleware/middleware"
+import { accessTo, isLoggedIn } from "../../../middleware/middleware"
+import { Role } from "../../../types/role"
 
 const router:Router=express.Router()
 
-router.route("/teacher").post(isLoggedIn,
+router.route("/:instituteNumber/teacher").post(isLoggedIn,
     accessTo(Role.Institute),
     upload.single("teacherImage"),
     asyncErrorHandler(createTeacher))
 
-router.route("/teacher").get(isLoggedIn,
+router.route("/:instituteNumber/teacher").get(isLoggedIn,
     asyncErrorHandler(getAllTeachers))
 
-router.route("/teacher/:instituteNumber/:id").get(isLoggedIn,
+router.route("/teacher").get(isLoggedIn,
     asyncErrorHandler(getSingleTeacher))
 
-router.route("/teacher/:id").delete(isLoggedIn,
+router.route("/:instituteNumber/teacher/:id").delete(isLoggedIn,
     accessTo(Role.Institute),
     asyncErrorHandler(deleteTeacher))
 

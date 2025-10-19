@@ -1,7 +1,8 @@
 import express, { Router } from "express"
-import { accessTo, changeUserIdForTableName, isLoggedIn, Role } from "../../../middleware/middleware"
+import { accessTo, changeUserIdForTableName, isLoggedIn } from "../../../middleware/middleware"
 import asyncErrorHandler from "../../../services/asyncErrorHandler"
 import { createStudentCourseOrder, esewaPaymentVerification, khaltiPaymentVerification } from "../../../controllers/student/order/student-order-controller"
+import { Role } from "../../../types/role"
 
 const router:Router=express.Router()
 

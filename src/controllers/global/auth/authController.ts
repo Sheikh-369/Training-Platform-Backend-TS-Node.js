@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken"
 import generateOTP from "../../../services/generateOTP";
 import sendMail from "../../../services/sendMail";
 import { now } from "sequelize/types/utils";
+import UserInstituteRole from "../../../database/models/userInstituteRoleModel";
 class AuthController{
 
     //***********************REGISTER************************** */
@@ -46,45 +47,99 @@ class AuthController{
     }
 
     //***********************LOGIN*************************** */
-    static async loginUser(req:Request,res:Response){
+    // static async loginUser(req:Request,res:Response){
     
-        const {userEmail,userPassword}=req.body
-        if(!userEmail || !userPassword){
-            res.status(400).json({
-                message:"Please provide email and password!"
-            })
-            return
+    //     const {userEmail,userPassword}=req.body
+    //     if(!userEmail || !userPassword){
+    //         res.status(400).json({
+    //             message:"Please provide email and password!"
+    //         })
+    //         return
+    //     }
+
+    //     const data=await User.findAll({
+    //         where:{
+    //             userEmail
+    //         }
+    //     })
+    //     if(data.length===0){
+    //         res.status(404).json({
+    //             message:"Email not registered!"
+    //         })
+    //     }else{
+    //         const isPassword=bcrypt.compareSync(userPassword,data[0].userPassword)
+    //         if(isPassword){
+    //             const userInstituteRoleData = await UserInstituteRole.findOne({
+    //                 where: { userId: data[0].id }});
+
+    //             const token=jwt.sign({
+    //                 id:data[0].id
+    //             },
+    //             process.env.JWT_SECRET!,{
+    //             expiresIn:"30d"})
+                
+    //             res.status(200).json({
+    //                 data:{
+    //                     id:data[0].id,
+    //                     token:token,
+    //                     userName: data[0].userName,
+    //                     instituteNumber:userInstituteRoleData?.instituteNumber
+    //                 },
+    //                 message:"Login Successful!"
+    //             })                
+    //         }else{
+    //             res.status(404).json({
+    //                 message:"Invalid Email or Password!"
+    //             })
+    //         }
+    //     }
+    // }
+
+    //change2
+    static async loginUser(req: Request, res: Response) {
+        const { userEmail, userPassword } = req.body;
+        if (!userEmail || !userPassword) {
+            res.status(400).json({ message: "Please provide email and password!" });
+            return;
         }
 
-        const data=await User.findAll({
-            where:{
-                userEmail
-            }
-        })
-        if(data.length===0){
-            res.status(404).json({
-                message:"Email not registered!"
-            })
-        }else{
-            const isPassword=bcrypt.compareSync(userPassword,data[0].userPassword)
-            if(isPassword){
-                const token=jwt.sign({id:data[0].id},process.env.JWT_SECRET!,{
-                expiresIn:"30d"})
-                res.status(200).json({
-                    data:{
-                        id:data[0].id,
-                        token:token,
-                        userName: data[0].userName,
-                    },
-                    message:"Login Successful!"
-                })                
-            }else{
-                res.status(404).json({
-                    message:"Invalid Email or Password!"
-                })
-            }
+        const data = await User.findAll({ where: { userEmail } });
+        if (data.length === 0) {
+            res.status(404).json({ message: "Email not registered!" });
+            return;
         }
+
+        const user = data[0];
+
+        const isPassword = bcrypt.compareSync(userPassword, user.userPassword);
+        if (!isPassword) {
+            res.status(404).json({ message: "Invalid Email or Password!" });
+            return;
+        }
+
+        // Fetch all roles for this user (all institutes user belongs to)
+        const userInstituteRoles = await UserInstituteRole.findAll({
+            where: { userId: user.id }
+        });
+
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET!, {
+            expiresIn: "30d"
+        });
+
+        res.status(200).json({
+            data: {
+            id: user.id,
+            token,
+            userName: user.userName,
+            institutes: userInstituteRoles.map(role => ({
+                instituteNumber: role.instituteNumber,
+                role: role.role
+            }))
+            },
+            message: "Login Successful!"
+        });
     }
+
 
     static async forgotPassword(req:Request,res:Response){
     const {userEmail}=req.body

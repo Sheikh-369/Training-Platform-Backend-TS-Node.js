@@ -2,7 +2,8 @@ import express, { Router } from "express"
 import asyncErrorHandler from "../../../../services/asyncErrorHandler"
 import { createChapterLesson, deleteLesson, editChapterLesson, fetchChapterLesson } from "../../../../controllers/teacher/course/lesson/lesson-controller"
 import upload from "../../../../middleware/multerUpload"
-import { accessTo, isLoggedIn, Role } from "../../../../middleware/middleware"
+import { accessTo, isLoggedIn } from "../../../../middleware/middleware"
+import { Role } from "../../../../types/role"
 
 const route:Router=express.Router()
 

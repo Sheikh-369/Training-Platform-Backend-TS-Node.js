@@ -4,7 +4,12 @@ import sequelize from "../../../database/connection";
 import { QueryTypes } from "sequelize";
 
 const createCourse=async(req:IExtendedRequest,res:Response)=>{
-    const instituteNumber=req.user?.currentInstituteNumber
+    // const instituteNumber=req.user?.currentInstituteNumber
+    const instituteNumber = req.params.instituteNumber;
+
+    if (!instituteNumber) {
+        return res.status(400).json({ message: "Institute number is required in URL." });
+    }
     const {courseName,coursePrice,courseDuration,courseDescription,courseLevel,categoryId,teacherId}=req.body
 
     const courseThumbnail=req.file?req.file.path: null
@@ -27,7 +32,13 @@ const createCourse=async(req:IExtendedRequest,res:Response)=>{
 }
 
 const getAllCourses=async(req:IExtendedRequest,res:Response)=>{
-    const instituteNumber=req.user?.currentInstituteNumber
+    // const instituteNumber=req.user?.currentInstituteNumber
+    const instituteNumber = req.params.instituteNumber;
+
+    if (!instituteNumber) {
+        return res.status(400).json({ message: "Institute number is required in URL." });
+    }
+
     const courses=await sequelize.query(`SELECT 
      course_${instituteNumber}.*, 
      category_${instituteNumber}.categoryName AS categoryName,
