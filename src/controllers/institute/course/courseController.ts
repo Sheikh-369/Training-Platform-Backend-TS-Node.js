@@ -60,7 +60,11 @@ const getAllCourses=async(req:IExtendedRequest,res:Response)=>{
 }
 
 const getSingleCourse=async(req:IExtendedRequest,res:Response)=>{
-    const instituteNumber=req.user?.currentInstituteNumber
+    // const instituteNumber=req.user?.currentInstituteNumber
+    const instituteNumber = req.params.instituteNumber;
+    if (!instituteNumber) {
+        return res.status(400).json({ message: "Institute number is required in URL." });
+    }
     const courseId=req.params.id
     const course=await sequelize.query(`SELECT 
      course_${instituteNumber}.*, 

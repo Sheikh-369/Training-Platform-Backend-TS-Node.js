@@ -25,6 +25,7 @@ router.route("/:instituteNumber/course").get(
 router.route("/course/:id").get(isLoggedIn,
     asyncErrorHandler(getSingleCourse))
 
+
 router.route("/course/:id").delete(isLoggedIn,
     accessTo(Role.Institute),
     asyncErrorHandler(deleteCourse))

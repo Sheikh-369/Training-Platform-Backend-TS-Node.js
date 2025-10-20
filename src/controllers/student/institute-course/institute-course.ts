@@ -71,7 +71,8 @@ const instituteCourseListForStudent = async (req: Request, res: Response) => {
             i.instituteName AS instituteName,
             i.instituteImage AS instituteImage,
             c.courseName, 
-            c.coursePrice, 
+            c.coursePrice,
+            c.courseThumbnail, 
             c.courseDuration, 
             c.courseDescription,
             cat.categoryName,
@@ -100,7 +101,54 @@ const instituteCourseListForStudent = async (req: Request, res: Response) => {
     }
 };
 
+const instituteCourseDetailsForStudent = async (req: Request, res: Response) => {
+  const { instituteId, courseId } = req.params;
 
+  try {
+    const [course] = await sequelize.query(
+      `
+      SELECT 
+        i.instituteName AS instituteName,
+        i.instituteImage AS instituteImage,
+        c.id AS courseId,
+        c.courseName, 
+        c.coursePrice,
+        c.courseThumbnail, 
+        c.courseDuration, 
+        c.courseDescription,
+        cat.categoryName,
+        t.teacherName
+      FROM institute_${instituteId} AS i
+      CROSS JOIN course_${instituteId} AS c
+      LEFT JOIN category_${instituteId} AS cat
+        ON c.categoryId = cat.id
+      LEFT JOIN teacher_${instituteId} AS t
+        ON c.teacherId = t.id
+      WHERE c.id = :courseId
+      LIMIT 1
+      `,
+      {
+        replacements: { courseId },
+        type: QueryTypes.SELECT,
+      }
+    );
 
+    if (!course) {
+      return res.status(404).json({
+        message: "Course not found",
+      });
+    }
 
-export {fetchInstitutes,instituteCourseListForStudent}
+    res.status(200).json({
+      message: "Course fetched successfully!",
+      data: course,
+    });
+  } catch (error) {
+    console.error("Error fetching course details:", error);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export {fetchInstitutes,instituteCourseListForStudent,instituteCourseDetailsForStudent}
