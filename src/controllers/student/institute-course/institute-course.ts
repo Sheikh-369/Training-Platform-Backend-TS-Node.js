@@ -67,7 +67,8 @@ const instituteCourseListForStudent = async (req: Request, res: Response) => {
     const instituteId = req.params.instituteId;
 
     const datas = await sequelize.query(`
-        SELECT 
+        SELECT
+            c.id AS id, 
             i.instituteName AS instituteName,
             i.instituteImage AS instituteImage,
             c.courseName, 
@@ -102,15 +103,16 @@ const instituteCourseListForStudent = async (req: Request, res: Response) => {
 };
 
 const instituteCourseDetailsForStudent = async (req: Request, res: Response) => {
-  const { instituteId, courseId } = req.params;
+  const { instituteId, id } = req.params;
 
   try {
     const [course] = await sequelize.query(
       `
-      SELECT 
+      SELECT
+        c.id AS id, 
         i.instituteName AS instituteName,
         i.instituteImage AS instituteImage,
-        c.id AS courseId,
+        c.id AS id,
         c.courseName, 
         c.coursePrice,
         c.courseThumbnail, 
@@ -124,11 +126,11 @@ const instituteCourseDetailsForStudent = async (req: Request, res: Response) => 
         ON c.categoryId = cat.id
       LEFT JOIN teacher_${instituteId} AS t
         ON c.teacherId = t.id
-      WHERE c.id = :courseId
+      WHERE c.id = :id
       LIMIT 1
       `,
       {
-        replacements: { courseId },
+        replacements: { id },
         type: QueryTypes.SELECT,
       }
     );

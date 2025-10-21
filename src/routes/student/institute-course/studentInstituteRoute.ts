@@ -8,7 +8,7 @@ router.route("/institute").get(asyncErrorHandler(fetchInstitutes))
 router.route("/:instituteId/course").get(asyncErrorHandler(instituteCourseListForStudent))
 
 //for guest from home page
-router.route("/:instituteId/course/:courseId").get(
+router.route("/:instituteId/course/:id").get(
     asyncErrorHandler(instituteCourseDetailsForStudent)
 )
 
