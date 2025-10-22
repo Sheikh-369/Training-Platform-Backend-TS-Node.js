@@ -26,11 +26,12 @@ router.route("/course/:id").get(isLoggedIn,
     asyncErrorHandler(getSingleCourse))
 
 
-router.route("/course/:id").delete(isLoggedIn,
+router.route("/:instituteNumber/course/:id").delete(
+    isLoggedIn,
     accessTo(Role.Institute),
     asyncErrorHandler(deleteCourse))
 
-router.route("/course/:id").patch(isLoggedIn,
+router.route("/:instituteNumber/course/:id").patch(isLoggedIn,
     accessTo(Role.Institute),
     upload.single("courseThumbnail"),
     asyncErrorHandler(updateCourse))
