@@ -317,7 +317,7 @@ const createTeacher = async (req: IExtendedRequest, res: Response) => {
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
           <h2 style="color: #2E86C1;">Welcome to ${teacherInstituteName}, ${teacherName}!</h2>
-          <p>You’ve been added as a <strong>teacher</strong>.</p>
+          <p>You've been added as a <strong>teacher</strong>.</p>
           <p>Here are your login credentials:</p>
           <ul style="background-color: #f4f4f4; padding: 15px; border-radius: 8px; list-style: none;">
             <li><strong>Email:</strong> ${teacherEmail}</li>
@@ -340,7 +340,7 @@ const createTeacher = async (req: IExtendedRequest, res: Response) => {
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
           <h2 style="color: #2E86C1;">Hello ${teacherName},</h2>
-          <p>You’ve been added as a <strong>teacher</strong> in <strong>${teacherInstituteName}</strong>.</p>
+          <p>You've been added as a <strong>teacher</strong> in <strong>${teacherInstituteName}</strong>.</p>
           <p>You can now access this institute using your existing login credentials.</p>
           <ul style="background-color: #f4f4f4; padding: 15px; border-radius: 8px; list-style: none;">
             <li><strong>Email:</strong> ${teacherEmail}</li>
@@ -362,7 +362,6 @@ const createTeacher = async (req: IExtendedRequest, res: Response) => {
     instituteNumber
   });
 };
-
 
 const getAllTeachers=async(req:IExtendedRequest,res:Response)=>{
     // const instituteNumber=req.user?.currentInstituteNumber

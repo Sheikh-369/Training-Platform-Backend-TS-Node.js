@@ -201,6 +201,59 @@ const createStudentTable = async (req: IExtendedRequest, res: Response, next: Ne
     next();
 };
 
+//student order table
+const createStudentOrderTable = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
+    const instituteNumber=req.instituteNumber
+    await sequelize.query(`
+        CREATE TABLE IF NOT EXISTS student_order_${instituteNumber} (
+            id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()), 
+            email VARCHAR(50) NOT NULL,
+            whatsapp_no VARCHAR(26) NOT NULL, 
+            remarks TEXT, 
+            createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+            updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )
+    `);
+    next();
+};
+
+//studennt order details table
+const createStudentOrderDetailsTable = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
+    const instituteNumber=req.instituteNumber
+    await sequelize.query(`
+        CREATE TABLE IF NOT EXISTS student_order_details_${instituteNumber} (
+            id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()), 
+            courseId VARCHAR(36), 
+            instituteId VARCHAR(36), 
+            orderId VARCHAR(36) REFERENCES student_order_${instituteNumber}(id) ON DELETE CASCADE, 
+            createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+            updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )
+    `);
+    next();
+};
+
+//student payment table
+const createStudentPaymentTable = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
+    const instituteNumber=req.instituteNumber
+    await sequelize.query(`
+        CREATE TABLE IF NOT EXISTS student_payment_${instituteNumber} (
+            id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()), 
+            paymentMethod ENUM('esewa','khalti','cod'), 
+            paymentStatus ENUM('paid','pending','unpaid') DEFAULT 'unpaid',
+            totalAmount DECIMAL(10,2) NOT NULL,
+            orderId VARCHAR(36) REFERENCES student_order_${instituteNumber}(id) ON DELETE CASCADE,
+            pidx VARCHAR(100),
+            transaction_uuid VARCHAR(150), 
+            createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+            updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE(orderId)
+        )
+    `);
+    next();
+};
+
+
 const createCategoryTable = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
     // const instituteNumber = req.user?.currentInstituteNumber;
     const instituteNumber=req.instituteNumber
@@ -221,7 +274,6 @@ const createCategoryTable = async (req: IExtendedRequest, res: Response, next: N
 
     next();
 };
-
 
 const createCourseTable = async (req: IExtendedRequest, res: Response) => {
     // const instituteNumber=req.user?.currentInstituteNumber
@@ -510,4 +562,9 @@ export {createInstitute,
     createChapterLessonTable,
     createCourseTable,
     createCategoryTable,
-    createStudentTable,fetchSingleInstitute,editInstituteInfo}
+    createStudentTable,
+    createStudentOrderTable,
+    createStudentOrderDetailsTable,
+    createStudentPaymentTable,
+    fetchSingleInstitute,
+    editInstituteInfo}

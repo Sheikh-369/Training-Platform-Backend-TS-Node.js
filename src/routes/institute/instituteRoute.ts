@@ -1,5 +1,5 @@
 import express, { Router } from "express"
-import { createCategoryTable, createChapterLessonTable, createCourseChapterTable, createCourseTable, createInstitute, createStudentTable, createTeacherTable, editInstituteInfo, fetchInstituteDetails, fetchSingleInstitute } from "../../controllers/institute/instituteController"
+import { createCategoryTable, createChapterLessonTable, createCourseChapterTable, createCourseTable, createInstitute, createStudentOrderDetailsTable, createStudentOrderTable, createStudentPaymentTable, createStudentTable, createTeacherTable, editInstituteInfo, fetchInstituteDetails, fetchSingleInstitute } from "../../controllers/institute/instituteController"
 import asyncErrorHandler from "../../services/asyncErrorHandler"
 import { accessTo, isLoggedIn, } from "../../middleware/middleware"
 import upload from "../../middleware/multerUpload"
@@ -13,6 +13,9 @@ router.route("/institute").post(isLoggedIn,
     asyncErrorHandler(createCourseChapterTable),
     asyncErrorHandler(createChapterLessonTable),
     asyncErrorHandler(createStudentTable),
+    asyncErrorHandler(createStudentOrderTable),
+    asyncErrorHandler(createStudentOrderDetailsTable),
+    asyncErrorHandler(createStudentPaymentTable),
     asyncErrorHandler(createCategoryTable),
     asyncErrorHandler(createCourseTable))
 
