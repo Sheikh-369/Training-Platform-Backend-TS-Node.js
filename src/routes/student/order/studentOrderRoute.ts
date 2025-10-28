@@ -12,15 +12,17 @@ router.route("/:instituteId/order/:courseId").post(
     asyncErrorHandler(createStudentOrder)
 )
 
-router.route("/verify-khalti-payment").post(isLoggedIn,
-    changeUserIdForTableName,
-    accessTo(Role.Student),
+router.route("/verify-khalti-payment").post(
+    // isLoggedIn,
+    // changeUserIdForTableName,
+    // accessTo(Role.Student),
     asyncErrorHandler(khaltiPaymentVerification)
 )
 
-router.route("/verify-esewa-payment").post(isLoggedIn,
-    changeUserIdForTableName,
-    accessTo(Role.Student),
+router.route("/verify-esewa-payment").post(
+    // isLoggedIn,
+    // changeUserIdForTableName,
+    // accessTo(Role.Student),
     asyncErrorHandler(esewaPaymentVerification)
 )
 
