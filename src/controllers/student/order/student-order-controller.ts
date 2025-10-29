@@ -490,7 +490,7 @@ const orderId = newOrders[0].id;
 
   if (paymentMethod === PaymentMethod.KHALTI) {
     const data = {
-      return_url: "http://localhost:3000/payment/verify/khalti",
+      return_url: "http://localhost:3000/payment/khalti/verify",
       website_url: "http://localhost:3000/",
       amount: totalAmount * 100,
       purchase_order_id: orderId,
@@ -578,84 +578,96 @@ const orderId = newOrders[0].id;
   return res.status(200).json({ message: "Order created successfully!" });
 };
 
-// ---------------------------- Khalti Verification ----------------------------
-// export const khaltiPaymentVerification = async (req: Request, res: Response) => {
-//   const { instituteNumber, pidx } = req.body;
-//   const paymentTable = `student_payment_${instituteNumber}`;
 
-//   if (!pidx) return res.status(400).json({ message: "Please provide pidx" });
-
-//   const response = await axios.post<KhaltiLookupResponse>(
-//     "https://dev.khalti.com/api/v2/epayment/lookup/",
-//     { pidx },
-//     { headers: { Authorization: `Key d6b8b250e2024fb5b258a9beee2fa6c6` } }
-//   );
-
-//   const status = response.data.status === "Completed" ? "paid" : "failed";
-
-//   await sequelize.query(
-//     `UPDATE ${paymentTable} SET paymentStatus=? WHERE pidx=?`,
-//     { type: QueryTypes.UPDATE, replacements: [status, pidx] }
-//   );
-
-//   return res.status(200).json({ message: status === "paid" ? "Payment Verified Successfully!" : "Payment Not Verified!" });
-// };
-
-
-
-interface Order {
-  instituteNumber: string;
+interface TableRow {
+  [key: string]: string;
 }
-
+// ---------------------------- KHALTI Verification ----------------------------
 export const khaltiPaymentVerification = async (req: Request, res: Response) => {
-  const { pidx, purchase_order_id } = req.body;
+  const { pidx } = req.body;
 
-  if (!pidx || !purchase_order_id)
-    return res.status(400).json({ message: "Missing pidx or purchase order ID" });
+  if (!pidx) {
+    return res.status(400).json({ message: "Missing pidx" });
+  }
 
   try {
-    // Step 1: Lookup the order in your database to get instituteNumber
-    const orders = await sequelize.query<Order>(
-      "SELECT instituteNumber FROM student_orders WHERE orderId = ?",
-      { replacements: [purchase_order_id], type: QueryTypes.SELECT }
-    );
+    // 🔍 Step 1: Find which institute's table contains this pidx
+    const [tables] = (await sequelize.query(
+      "SHOW TABLES LIKE 'student_payment_%'"
+    )) as [TableRow[], unknown];
 
-    const order = orders[0];
+    let instituteNumber: string | null = null;
 
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+    for (const row of tables) {
+      const tableName = Object.values(row)[0]; // "student_payment_1", etc.
+
+      const [payment] = await sequelize.query(
+        `SELECT 1 FROM ${tableName} WHERE pidx = ? LIMIT 1`,
+        { replacements: [pidx], type: QueryTypes.SELECT }
+      );
+
+      if (payment) {
+        instituteNumber = tableName.split("_").pop()!;
+        break;
+      }
     }
 
-    const instituteNumber = order.instituteNumber;
+    if (!instituteNumber) {
+      return res
+        .status(404)
+        .json({ message: "Payment not found in any institute table" });
+    }
+
     const paymentTable = `student_payment_${instituteNumber}`;
 
-    // Step 2: Call Khalti lookup API
+    // 🔗 Step 2: Verify payment from Khalti
     const response = await axios.post(
       "https://dev.khalti.com/api/v2/epayment/lookup/",
       { pidx },
-      { headers: { Authorization: `Key YOUR_KHALTI_SECRET_KEY` } }
+      {
+        headers: {
+          Authorization: "Key d6b8b250e2024fb5b258a9beee2fa6c6", // 🟡 use env var in production!
+        },
+      }
     );
 
-    const status = response.data.status === "Completed" ? "paid" : "failed";
+    const data = response.data;
+    const status = data.status === "Completed" ? "paid" : "failed";
 
-    // Step 3: Update the payment table
+    // 💾 Step 3: Update payment status
     await sequelize.query(
-      `UPDATE ${paymentTable} SET paymentStatus=? WHERE pidx=?`,
-      { type: QueryTypes.UPDATE, replacements: [status, pidx] }
+      `UPDATE ${paymentTable} SET paymentStatus = ? WHERE pidx = ?`,
+      {
+        type: QueryTypes.UPDATE,
+        replacements: [status, pidx],
+      }
     );
 
+    // ✅ Step 4: Send final response
     if (status === "paid") {
-      res.json({ message: "Payment Verified Successfully!" });
+      return res.status(200).json({
+        message: "Payment Verified Successfully!",
+        data: {
+          pidx,
+          status: "paid",
+          amount: data.total_amount,
+          transaction_id: data.transaction_id,
+        },
+      });
     } else {
-      res.json({ message: "Payment Failed or Not Verified." });
+      return res.status(400).json({
+        message: "Payment not verified or failed.",
+        data: { pidx, status },
+      });
     }
   } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ message: "Server error", error: err.message });
+    console.error("Khalti verification error:", err.message);
+    return res.status(500).json({
+      message: "Server error",
+      error: err.message,
+    });
   }
 };
-
-
 
 // ---------------------------- ESEWA Verification ----------------------------
 export const esewaPaymentVerification = async (req: Request, res: Response) => {
